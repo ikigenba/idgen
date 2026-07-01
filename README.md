@@ -14,10 +14,21 @@ So it is two things at once:
 
 ## What idgen is (the end product)
 
-A small CLI that mints stable spec/requirement IDs of the form `R-XXXX-XXXX` from
-the wall-clock instant of minting — and decodes them back to that instant. Every ID
-is anchored to a **2026 UTC epoch**, so it stays traceable to the moment it was
-minted.
+Specs and the code that implements them need stable, traceable IDs — a token you
+can drop into a requirement, a source comment, or a test name and always trace back
+to one item. A UUID would do it, but it's overkill: within a single project each ID
+only has to be unique *among its peers*, not across the universe. `idgen` mints an
+ID for exactly that job — far shorter than a UUID, and one that decodes back to when
+it was minted.
+
+It's a small CLI that mints those IDs in the form `R-XXXX-XXXX` from the millisecond
+it was minted — and decodes them back to that same millisecond. Every ID is anchored
+to a **2026 UTC epoch**, so it stays traceable to the moment it was minted.
+
+The millisecond count isn't shown raw — it runs through a reversible affine
+bijection (a modular multiply-and-add) before base-36 encoding, so consecutive
+milliseconds land far apart and the IDs look random and scattered. Because the map
+is one-to-one, `--decode` inverts it exactly to recover the original millisecond.
 
 ```sh
 $ idgen
@@ -30,10 +41,10 @@ $ idgen --decode R-4K7P-9ZQ2
 - `-n N` / `--number N` — mint N IDs, one per line, all distinct.
 - `-p PREFIX` / `--prefix PREFIX` — override the default `R` prefix.
 - `--decode` — decode IDs (from args or whitespace-separated stdin) to their
-  ISO-8601 UTC minting instant.
+  ISO-8601 UTC minting time, to the millisecond.
 - `--help`, `--version` — usage and version (`0.1.0-pre+20260616`).
 
-All times are UTC; IDs are minted only from instants that have already elapsed.
+All times are UTC; IDs are minted only from a millisecond that has already elapsed.
 
 These are the very same `R-XXXX-XXXX` ids that this project uses to track its own
 requirements — the design mints one per checkable behavior, so **`idgen` is built
