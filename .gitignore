@@ -1,0 +1,4 @@
+/bin/
+
+# Phase-scoped build-loop brief (gather authors it; verify deletes it on pass/stall)
+/project/prompts/brief.md
