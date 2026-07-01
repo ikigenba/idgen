@@ -4,6 +4,8 @@ This repository is **`idgen` with no source code.** It ships the spec that
 *generates* it — and nothing else. Point an AI coding agent at that spec and it
 writes the code, tests it, and proves it against the spec.
 
+*Just want to build it? See the [build instructions](#how-to-build-it) below.*
+
 So it is two things at once:
 
 1. **A way to get and build `idgen`** — clone it, run one of the build methods
@@ -65,11 +67,10 @@ per-method requirements are listed in each document linked below.
 The spec is the same for every path; the methods differ only in *who drives the
 loop* and *how much is automated*. Pick one:
 
-- **[`ralph`](docs/ralph.md)** — a purpose-built harness runs the whole
-  gather → build → verify loop unattended: point it at the three prompts and walk
-  away. It is the reference path the spec was designed around, but it is **bespoke
-  tooling** you have to install and learn on its own terms. If you don't already
-  use it, one of the interactive paths below is likely the better choice.
+- **[`ralph`](docs/ralph.md)** — a purpose-built harness used across the ikigenba
+  projects. Point it at the three prompts and walk away; it runs the spec's build
+  loop unattended. If you don't already use it, one of the interactive paths below
+  is likely the better choice.
 - **[Claude Code](docs/claude-code.md)** — drive the same loop interactively with
   Claude Code. Paste one orchestration prompt and it cycles the phases for you.
   A good default for most people.
