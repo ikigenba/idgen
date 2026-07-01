@@ -14,16 +14,14 @@ So it is two things at once:
 
 ## What idgen is (the end product)
 
-Specs and the code that implements them need stable, traceable IDs — a token you
-can drop into a requirement, a source comment, or a test name and always trace back
-to one item. A UUID would do it, but it's overkill: within a single project each ID
-only has to be unique *among its peers*, not across the universe. `idgen` mints an
-ID for exactly that job — far shorter than a UUID, and one that decodes back to when
-it was minted.
+Specs and the code that implements them need stable, traceable IDs to embed in
+requirements, comments, and test names. These only need to be unique within one
+project, not globally, so they can be much shorter than a UUID.
 
-It's a small CLI that mints those IDs in the form `R-XXXX-XXXX` from the millisecond
-it was minted — and decodes them back to that same millisecond. Every ID is anchored
-to a **2026 UTC epoch**, so it stays traceable to the moment it was minted.
+`idgen` is a small CLI that mints those IDs in the form `R-XXXX-XXXX` from the
+millisecond it was minted — and decodes them back to that same millisecond. Every ID
+is anchored to a **2026 UTC epoch**, so it stays traceable to the moment it was
+minted.
 
 The millisecond count isn't shown raw — it runs through a reversible affine
 bijection (a modular multiply-and-add) before base-36 encoding, so consecutive
