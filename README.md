@@ -1,50 +1,16 @@
 # idgen
 
-This repository is **`idgen` with no source code.** It ships only the spec and
-prompts needed to *generate* it: a product brief, a split design, a build plan, and
-the three [`ralph`](https://github.com/ikigenba/ralph) build-loop prompts. Point
-`ralph` at them and it writes the code, one phase at a time, until the tool is built
-and every requirement is proven.
+This repository is **`idgen` with no source code.** It ships the spec that
+*generates* it — and nothing else. Point an AI coding agent at that spec and it
+writes the code, tests it, and proves it against the spec.
 
 So it is two things at once:
 
-1. **A way to get and build `idgen`** — clone it, run `ralph`, end up with a
-   working binary.
-2. **A worked demonstration of the `ralph` method** — how a small, fully-specified
-   project is authored interactively with the `/*-mode` commands and then built
-   autonomously from *spec + prompts*, with no state held in the model's memory
-   between turns.
-
-## Build it with `ralph`
-
-Requires Go 1.26+, a `ralph`-supported agent (e.g. `codex`), and the
-[`ralph`](https://github.com/ikigenba/ralph) harness.
-
-Clone the repo and, **from the repository root**, run `ralph` against the three
-build-loop prompts:
-
-```sh
-git clone https://github.com/ikigenba/idgen.git
-cd idgen
-ralph project/prompts/gather.md project/prompts/build.md project/prompts/verify.md
-```
-
-That single command is the whole build. `ralph` cycles the three prompts in fresh,
-isolated contexts — **gather → build → verify → …** — writing one package per phase
-until `gather` finds no unbuilt phase and reports `DONE`. You end up with the
-`cmd/`, `internal/`, and `go.mod` that weren't in the repo, with every design
-requirement id covered by an id-tagged test.
-
-You now have source — build and test it the normal way:
-
-```sh
-make build      # compile to bin/idgen
-make test       # go test ./...
-```
-
-Always invoke `ralph` from the repository root so the prompt paths and the
-`project/` spec they read resolve correctly. `ralph` owns the lifecycle and the
-budget rails (`--max-spend`, `--max-time`, …); see its README for the flags.
+1. **A way to get and build `idgen`** — clone it, run one of the build methods
+   below, end up with a working binary.
+2. **A demonstration of spec-first construction** — a small project fully specified
+   up front, then built from that spec rather than typed by hand. See
+   [how the spec is structured](docs/spec-structure.md) for how that works.
 
 ## What idgen is (the end product)
 
@@ -73,59 +39,35 @@ These are the very same `R-XXXX-XXXX` ids that this project uses to track its ow
 requirements — the design mints one per checkable behavior, so **`idgen` is built
 using `idgen`**.
 
-## What's in the box
+## Prerequisites
 
-There is no `cmd/`, `internal/`, or `go.mod` here yet — only the contract and the
-harness that turns it into code:
+Every build method produces the same Go program, so two things are required no
+matter which path you take:
 
-```
-project/product/product.md     why idgen exists, for whom, and what it promises (outcomes)
-project/design/README.md       the design spine: Conventions, the requirement-id denominator, layout
-project/design/INDEX.md        manifest: each Decision → its file, plus a sorted R-id → Decision map
-project/design/DNN.md          one self-contained Decision each — seams, interfaces, and its Verification ids
-project/plan/README.md         the plan rules (one phase = one package; the done bar)
-project/plan/STATUS.md         the manifest: one ⬜/✅ line per phase, the only home of status markers
-project/plan/phase-NN.md       one body per phase — objective + the id slice it must cover
-project/prompts/{gather,build,verify}.md   the three ralph build-loop prompts
-project/README.md              the workspace map + the full build-loop overview
-.claude/commands/              the /product-, /research-, /design-, /plan-mode and
-                               /create-gather-build-verify-prompts commands that authored the spec
-.claude/library/ralph/         the ralph family map skill
-```
+- **Go 1.26+** — the spec targets it; the generated code and tests need it to
+  compile and run.
+- **`git`** — to clone this repository.
 
-The `.claude/` commands and skill are version-controlled and ship with the repo on
-purpose: the same interactive commands that produced this contract travel with it,
-so the *method* is reproducible — not just its output. Clone the project and you
-have everything needed both to author the spec and to build from it.
+Each method then needs its own agent tooling on top of that baseline. The
+per-method requirements are listed in each document linked below.
 
-## How the method works
+## How to build it
 
-The spec under `project/` is the whole contract; the code is downstream of it. The
-three authorities never restate each other:
+The spec is the same for every path; the methods differ only in *who drives the
+loop* and *how much is automated*. Pick one:
 
-- **`project/product/product.md`** owns *why* — the problem, the users, and the
-  user-facing promises in outcome terms. It never states mechanism.
-- **`project/design/`** owns *how* — seams, interfaces, types — and **the
-  denominator**: each Decision ends with a Verification list, and every item carries
-  a minted `R-XXXX-XXXX` id. That set of ids *is* the enumerated intent the test
-  suite is measured against; there is no separate requirements document. The design
-  is split for addressability (a spine + one `DNN.md` per Decision + an `INDEX.md`)
-  so a build phase reads only the one Decision it realizes.
-- **`project/plan/`** owns *construction order* — an append-only list of phases,
-  each one package's worth of work, naming the design Decisions and id slice it
-  realizes. `STATUS.md` is the only home of the `⬜`/`✅` markers.
+- **[`ralph`](docs/ralph.md)** — a purpose-built harness runs the whole
+  gather → build → verify loop unattended: point it at the three prompts and walk
+  away. It is the reference path the spec was designed around, but it is **bespoke
+  tooling** you have to install and learn on its own terms. If you don't already
+  use it, one of the interactive paths below is likely the better choice.
+- **[Claude Code](docs/claude-code.md)** — drive the same loop interactively with
+  Claude Code. Paste one orchestration prompt and it cycles the phases for you.
+  A good default for most people.
+- **[Codex CLI](docs/codex-cli.md)** — the same interactive loop, driven by the
+  Codex CLI instead. Also a good default if Codex is your agent.
 
-`ralph` builds it without holding anything between turns. **gather** is the only
-prompt that reads the big docs: it finds the next `⬜` phase and writes a tiny,
-self-contained `project/prompts/brief.md`. **build** reads only that brief, writes
-code and id-tagged tests (`// R-XXXX-XXXX`), and commits — so **coverage is a grep**.
-**verify** is the independent gate: it re-derives the denominator from the brief,
-proves every id is covered by a genuine test with `go test -race ./...` green, and
-only then flips the phase `⬜ → ✅`. A full overview of the loop — the status
-contract, the state machine, and the brief schema — is in
-[`project/README.md`](project/README.md).
-
-The spec itself was authored interactively, one decision at a time, by the
-`/*-mode` commands in [`.claude/commands/`](.claude/commands/) — product → research
-→ design → plan — and the loop prompts by `/create-gather-build-verify-prompts`.
-Build and verify are not authoring steps; they belong to `ralph`.
+New to the repo? Read **[how the spec is structured](docs/spec-structure.md)**
+first — it explains what you are actually building, why the spec is split the way
+it is, and how the gather → build → verify loop turns it into code. Every method
+above assumes that background.

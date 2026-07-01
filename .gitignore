@@ -2,3 +2,6 @@
 
 # Phase-scoped build-loop brief (gather authors it; verify deletes it on pass/stall)
 /project/prompts/brief.md
+
+# Durable loop-position marker (external-cursor orchestration; deleted on DONE)
+/project/prompts/cursor.md
