@@ -10,9 +10,10 @@ what the loop is doing and why. This page assumes it.
 
 ## Requirements
 
-On top of the repository-wide [prerequisites](../README.md#prerequisites) (Go 1.26+
-and `git`), this method needs:
+This method needs:
 
+- **Go 1.26+** — to compile and test the generated code.
+- **`git`** — to clone this repository.
 - The Codex CLI, installed and authenticated.
 
 Then clone the repo and start Codex from the repository root:

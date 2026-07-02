@@ -1,32 +1,32 @@
 # Build it with `ralph`
 
-`ralph` is a purpose-built harness that runs the whole gather → build → verify loop
-for you, unattended. You point it at the three prompts, and it cycles them in fresh,
-isolated contexts until the tool is built. This is the reference path the spec was
-designed around.
+`ralph` is a purpose-built harness used across the ikigenba projects. It runs a
+spec's prompt sequence unattended — cycling the prompts in fresh, isolated contexts
+until the build is done. This project's uses a three prompt sequence; gather → build → verify;
+you point `ralph` at it and walk away.
 
-New here? Read [how the spec is structured](spec-structure.md) first — it explains
-what the loop is doing and why. This page assumes it.
+If you're interested read [how the spec is structured](spec-structure.md).
 
-> **A note on tooling.** `ralph` is bespoke: it is its own harness with its own
-> install and its own flags. If you don't already run it, the interactive
-> [Claude Code](claude-code.md) or [Codex CLI](codex-cli.md) paths reach the same
-> result with tooling you may already have. Reach for `ralph` when you want the
-> loop to run fully hands-off.
+> **Why `ralph`.** Beyond running the build hands-off, `ralph` gives friendlier
+> progress feedback, lets you mix harnesses and models per prompt file, and manages
+> spend limits and max iterations. If you don't already run it, [Claude Code](claude-code.md)
+> or [Codex CLI](codex-cli.md) will get you the same result with tooling you likely
+> already have.
 
 ## Requirements
 
-On top of the repository-wide [prerequisites](../README.md#prerequisites) (Go 1.26+
-and `git`), this method needs:
+This method needs:
 
+- **Go 1.26+** — to compile and test the generated code.
+- **`git`** — to clone this repository.
 - The [`ralph`](https://github.com/ikigenba/ralph) harness, installed and on your
   `PATH`.
 - A `ralph`-supported agent (for example `codex`) configured for `ralph` to drive.
 
 ## Steps
 
-Clone the repo and, **from the repository root**, run `ralph` against the three
-build-loop prompts:
+Clone the repo and, **from the repository root**, run `ralph` against this spec's
+prompt sequence — its three build-loop prompts:
 
 ```sh
 git clone https://github.com/ikigenba/idgen.git
@@ -34,9 +34,9 @@ cd idgen
 ralph project/prompts/gather.md project/prompts/build.md project/prompts/verify.md
 ```
 
-That single command is the whole build. `ralph` cycles the three prompts in fresh,
-isolated contexts — **gather → build → verify → …** — writing one package per phase
-until `gather` finds no unbuilt phase and reports `DONE`. You end up with the
+That single command is the whole build. `ralph` cycles this spec's prompt sequence
+in fresh, isolated contexts — **gather → build → verify → …** — writing one package
+per phase until `gather` finds no unbuilt phase and reports `DONE`. You end up with the
 `cmd/`, `internal/`, and `go.mod` that weren't in the repo, with every design
 requirement id covered by an id-tagged test.
 

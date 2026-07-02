@@ -71,10 +71,10 @@ loop* and *how much is automated*. Pick one:
   projects. Point it at the three prompts and walk away; it runs the spec's build
   loop unattended. If you don't already use it, one of the interactive paths below
   is likely the better choice.
-- **[Claude Code](docs/claude-code.md)** — drive the same loop interactively with
+- **[claude code](docs/claude-code.md)** — drive the same loop interactively with
   Claude Code. Paste one orchestration prompt and it cycles the phases for you.
   A good default for most people.
-- **[Codex CLI](docs/codex-cli.md)** — the same interactive loop, driven by the
+- **[codex cli](docs/codex-cli.md)** — the same interactive loop, driven by the
   Codex CLI instead. Also a good default if Codex is your agent.
 
 New to the repo? Read **[how the spec is structured](docs/spec-structure.md)**
