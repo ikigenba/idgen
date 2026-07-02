@@ -21,7 +21,7 @@ This method needs:
 - **`git`** — to clone this repository.
 - The [`ralph`](https://github.com/ikigenba/ralph) harness, installed and on your
   `PATH`.
-- A `ralph`-supported agent (for example `codex`) configured for `ralph` to drive.
+- A `ralph`-supported agent (Claude Code or Codex CLI) installed.
 
 ## Steps
 
