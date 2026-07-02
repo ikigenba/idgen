@@ -20,9 +20,9 @@ Some projects, including the ikigenba projects, embed stable, traceable IDs in t
 requirements, comments, and test names. Those IDs only need to be unique within the
 project, not globally, so they can be much shorter than a UUID.
 
-`idgen` is a small CLI that mints those IDs in the form `R-XXXX-XXXX` from the
-millisecond it was minted. Every ID is anchored to a **2026 UTC epoch**, so it stays
-traceable to the moment it was minted.
+`idgen` is a small CLI that mints those IDs in the form `R-XXXX-XXXX`. Each ID
+encodes the number of milliseconds from a **2026 UTC epoch** to the moment it was
+minted.
 
 The millisecond count isn't shown raw. It runs through a reversible affine bijection
 (a modular multiply-and-add) before base-36 encoding, so consecutive milliseconds
@@ -34,7 +34,7 @@ case-insensitive, so it survives being lowercased in a URL, said aloud, or retyp
 by hand without a normalization step. It stays identifier- and URL-safe, so it
 embeds in comments, test names, and links with no escaping. And it stays short:
 eight base-36 characters hold 36⁸, about 2.8 trillion values, which is roughly 89
-years of milliseconds past the 2026 epoch, in a fixed-width body that splits cleanly
+years of milliseconds past the epoch, in a fixed-width body that splits cleanly
 4-4.
 
 ```sh
