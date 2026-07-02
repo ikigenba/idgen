@@ -11,31 +11,35 @@ So it is two things at once:
 1. **A way to get and build `idgen`:** clone it, run one of the build methods
    below, end up with a working binary.
 2. **A demonstration of spec-first construction:** a small project fully specified
-   up front, then built from that spec rather than typed by hand. See
-   [how the spec is structured](docs/spec-structure.md) for how that works.
+   up front, then built from that spec. See
+   [how the spec is structured](docs/spec-structure.md).
 
 ## What idgen is (the end product)
 
-Specs and the code that implements them need stable, traceable IDs to embed in
-requirements, comments, and test names. These only need to be unique within one
+Some projects, including the ikigenba projects, embed stable, traceable IDs in their
+requirements, comments, and test names. Those IDs only need to be unique within the
 project, not globally, so they can be much shorter than a UUID.
 
 `idgen` is a small CLI that mints those IDs in the form `R-XXXX-XXXX` from the
-millisecond it was minted, and decodes them back to that same millisecond. Every ID
-is anchored to a **2026 UTC epoch**, so it stays traceable to the moment it was
-minted.
+millisecond it was minted. Every ID is anchored to a **2026 UTC epoch**, so it stays
+traceable to the moment it was minted.
 
 The millisecond count isn't shown raw. It runs through a reversible affine bijection
 (a modular multiply-and-add) before base-36 encoding, so consecutive milliseconds
 land far apart and the IDs look random and scattered. Because the map is one-to-one,
-`--decode` inverts it exactly to recover the original millisecond.
+every distinct millisecond yields a distinct ID.
+
+The body uses base-36, digits `0-9` and uppercase `A-Z` only. That keeps an ID
+case-insensitive, so it survives being lowercased in a URL, said aloud, or retyped
+by hand without a normalization step. It stays identifier- and URL-safe, so it
+embeds in comments, test names, and links with no escaping. And it stays short:
+eight base-36 characters hold 36⁸, about 2.8 trillion values, which is roughly 89
+years of milliseconds past the 2026 epoch, in a fixed-width body that splits cleanly
+4-4.
 
 ```sh
 $ idgen
 R-4K7P-9ZQ2
-
-$ idgen --decode R-4K7P-9ZQ2
-2026-06-01T12:00:00.000Z
 ```
 
 - `-n N` / `--number N`: mint N IDs, one per line, all distinct.
