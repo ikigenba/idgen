@@ -35,8 +35,9 @@ ralph project/prompts/gather.md project/prompts/build.md project/prompts/verify.
 ```
 
 That single command is the whole build. `ralph` cycles this spec's prompt sequence
-in fresh, isolated contexts — **gather → build → verify → …** — writing one package
-per phase until `gather` finds no unbuilt phase and reports `DONE`. You end up with the
+in fresh, isolated contexts — **gather → build → verify → …** — building one phase
+at a time until `gather` finds no unbuilt phase and reports `DONE`. Each phase is a
+logically-related, right-sized chunk of work the spec lays out. You end up with the
 `cmd/`, `internal/`, and `go.mod` that weren't in the repo, with every design
 requirement id covered by an id-tagged test.
 
@@ -45,6 +46,7 @@ You now have source — build and test it the normal way:
 ```sh
 make build      # compile to bin/idgen
 make test       # go test ./...
+make install    # go install ./cmd/idgen (onto your PATH via GOBIN)
 ```
 
 ## Notes
@@ -52,4 +54,4 @@ make test       # go test ./...
 - **Always invoke `ralph` from the repository root** so the prompt paths and the
   `project/` spec they read resolve correctly.
 - `ralph` owns the lifecycle and the budget rails (`--max-spend`, `--max-time`, …);
-  see [its README](https://github.com/ikigenba/ralph) for the flags.
+  run `ralph --help` for the flags.

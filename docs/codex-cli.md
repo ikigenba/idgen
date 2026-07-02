@@ -89,4 +89,5 @@ id-tagged test. Build and test the result the normal way:
 ```sh
 make build      # compile to bin/idgen
 make test       # go test ./...
+make install    # go install ./cmd/idgen (onto your PATH via GOBIN)
 ```
