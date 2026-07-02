@@ -5,15 +5,15 @@ instead of a dedicated harness. You paste one orchestration prompt, and Codex sp
 a subagent per step, relays each step's status, and advances the cycle until it
 reports `DONE`. This is a good default if Codex is your agent.
 
-New here? Read [how the spec is structured](spec-structure.md) first — it explains
+New here? Read [how the spec is structured](spec-structure.md) first; it explains
 what the loop is doing and why. This page assumes it.
 
 ## Requirements
 
 This method needs:
 
-- **Go 1.26+** — to compile and test the generated code.
-- **`git`** — to clone this repository.
+- **Go 1.26+**, to compile and test the generated code.
+- **`git`**, to clone this repository.
 - The Codex CLI, installed and authenticated.
 
 Then clone the repo and start Codex from the repository root:
@@ -31,11 +31,11 @@ Both prompts drive the same gather → build → verify cycle; they differ only 
 
 - The **external-cursor** version keeps the current step in a file on disk
   (`project/prompts/cursor.md`). The step survives a context wipe, a crash, or you
-  closing Codex and resuming later — the orchestrator just re-reads the file and
-  picks up where it left off. **This is the preferred version** for a real build.
+  closing Codex and resuming later, because the orchestrator just re-reads the file
+  and picks up where it left off. **This is the preferred version** for a real build.
 - The **internal-cursor** version keeps the current step in the orchestrator's own
   running context and continues the goal until `DONE`. There is no bookkeeping file
-  to reason about, which makes it the simpler mental model — but the run has to
+  to reason about, which makes it the simpler mental model, though the run has to
   complete in one sitting.
 
 Pick one, paste it into Codex, and let it run.
