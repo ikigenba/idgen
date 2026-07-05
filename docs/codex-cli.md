@@ -30,7 +30,7 @@ Both prompts drive the same gather → build → verify cycle; they differ only 
 *where the current step is remembered*.
 
 - The **external-cursor** version keeps the current step in a file on disk
-  (`project/prompts/cursor.md`). The step survives a context wipe, a crash, or you
+  (`project/loops/cursor.md`). The step survives a context wipe, a crash, or you
   closing Codex and resuming later, because the orchestrator just re-reads the file
   and picks up where it left off. **This is the preferred version** for a real build.
 - The **internal-cursor** version keeps the current step in the orchestrator's own
@@ -42,14 +42,14 @@ Pick one, paste it into Codex, and let it run.
 
 ### External cursor (preferred)
 
-Keeps the loop position in `project/prompts/cursor.md`, so the build is resumable.
+Keeps the loop position in `project/loops/cursor.md`, so the build is resumable.
 
 ```
 /goal Advance the gather -> build -> verify prompt cycle until DONE (verify wraps
-  back to gather), using ./project/prompts/cursor.md as the durable current-step
+  back to gather), using ./project/loops/cursor.md as the durable current-step
   marker. Each iteration: read cursor.md for the current step; if it is missing or
   empty, the current step is gather. Spawn a Codex subagent to read and execute that
-  step's prompt file (./project/prompts/{gather,build,verify}.md); it ends by
+  step's prompt file (./project/loops/{gather,build,verify}.md); it ends by
   emitting a single JSON object of the form {"status": ..., "message": ...}. Parse
   its "status" and relay its "message" so progress stays visible, then act:
   CONTINUE -- leave cursor.md unchanged and continue the goal with the same step.
@@ -70,7 +70,7 @@ Keeps the loop position in the orchestrator's context and runs to `DONE` in one 
 /goal Cycle the prompt sequence gather -> build -> verify (verify wraps back to gather),
   starting at gather, until a subagent returns a DONE status. For each step, spawn a
   Codex subagent to read and execute the current prompt file
-  (./project/prompts/{gather,build,verify}.md); it ends by emitting a single JSON
+  (./project/loops/{gather,build,verify}.md); it ends by emitting a single JSON
   object of the form {"status": ..., "message": ...}. Parse its "status" and relay
   its "message" so progress stays visible. CONTINUE -- re-run the same prompt file.
   NEXT -- advance to the next prompt file (verify wraps to gather). DONE -- stop. If

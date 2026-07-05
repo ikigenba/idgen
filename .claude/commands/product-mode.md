@@ -5,15 +5,15 @@ We are in **product mode**. Goal: pin down *what* we're building and *why*.
 
 When this mode is entered, first load the `ralph` skill (the family map) — read `.claude/library/ralph/SKILL.md`, falling back to `~/.claude/library/ralph/SKILL.md` — then acknowledge it and **stop — wait for my instructions** before doing anything. Don't start interviewing until I tell you the feature or topic.
 
-This mode is **re-usable**: the product can evolve. If `project/product/product.md` already exists, read it first and treat it as the current state. As the goal changes, **edit that doc in place to align with the new goal — never append**. The doc is always a single, coherent statement of the current product, not a changelog.
+This mode is **re-usable**: the product can evolve. If `project/product/README.md` already exists, read it first and treat it as the current state. As the goal changes, **edit that doc in place to align with the new goal — never append**. The doc is always a single, coherent statement of the current product, not a changelog.
 
 Interview me — problem, purpose, users, scope (and what's deliberately out), any contractual constants, the user-facing promises, and the success criteria — challenging assumptions and stating your recommendation with each. **Ask one question at a time; never batch.** Wait for my answer before the next one. Anything you can settle by reading the codebase, settle it yourself instead of asking. Keep going until the scope is sharp.
 
-When we're done, write `project/product/product.md` in the shape below. Report the path.
+When we're done, write `project/product/README.md` in the shape below. Report the path.
 
 ## Output shape
 
-`project/product/product.md` owns **intent** — *why* this exists, *for whom*, what is in and out of scope, and what we **promise** the user — stated once, in **outcome terms**. It must NOT state mechanism, exact formats, exit codes, or test assertions; those belong to `project/design/README.md`. Where the two could overlap (behavior), product states the *promise*; design states the *exact, checkable proof of that promise*. This boundary is load-bearing — it is what keeps product, design, and plan from overlapping.
+`project/product/README.md` owns **intent** — *why* this exists, *for whom*, what is in and out of scope, and what we **promise** the user — stated once, in **outcome terms**. It must NOT state mechanism, exact formats, exit codes, or test assertions; those belong to `project/design/README.md`. Where the two could overlap (behavior), product states the *promise*; design states the *exact, checkable proof of that promise*. This boundary is load-bearing — it is what keeps product, design, and plan from overlapping.
 
 Write these sections, in order:
 

@@ -31,7 +31,7 @@ three build-loop prompts:
 ```sh
 git clone https://github.com/ikigenba/idgen.git
 cd idgen
-ralph project/prompts/gather.md project/prompts/build.md project/prompts/verify.md
+ralph project/loops/gather.md project/loops/build.md project/loops/verify.md
 ```
 
 That single command is the whole build. `ralph` cycles this spec's prompt sequence

@@ -61,7 +61,7 @@ plan, which is append-only history.
 
 | Command | Produces | Owns |
 | --- | --- | --- |
-| `/product-mode` | `project/product/product.md` | **why / intent** — problem, users, scope, promises, success criteria (outcomes only; no mechanism) |
+| `/product-mode` | `project/product/README.md` | **why / intent** — problem, users, scope, promises, success criteria (outcomes only; no mechanism) |
 | `/research-mode` | `project/research/research.md` | optional, **non-contractual** background that informs *you* before design; nothing downstream reads it |
 | `/design-mode` | `project/design/README.md` (spine) + `project/design/INDEX.md` (manifest) + `project/design/DNN.md` (one per Decision) | **shape + its proof** — seams, interfaces, types, the test strategy, and the minted `R-XXXX-XXXX` Verification ids |
 | `/plan-mode` | `project/plan/README.md` (rules) + `project/plan/STATUS.md` (manifest) + `project/plan/phase-NN.md` (one per phase) | **construction order + history** — dependency-ordered phases; append-only; `⬜`/`✅` markers live only in STATUS.md |

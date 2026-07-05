@@ -6,7 +6,7 @@
 *shape and its proof* is design's). Unlike product and design — which are rewritten
 in place to stay authoritative for the current state — the plan is **append-only**:
 completed phases are never rewritten or deleted, so the plan doubles as the
-construction history. To extend idgen: update `project/product/product.md` and
+construction history. To extend idgen: update `project/product/README.md` and
 `project/design/` **in place** first, then **append** a new phase — a new
 `project/plan/phase-NN.md` body plus a new line in `project/plan/STATUS.md`. Never
 edit a finished phase except to flip its status marker in `STATUS.md`.

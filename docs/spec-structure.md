@@ -21,14 +21,14 @@ There is no `cmd/`, `internal/`, or `go.mod` here yet, only the contract and the
 prompts that turn it into code:
 
 ```
-project/product/product.md     why idgen exists, for whom, and what it promises (outcomes)
+project/product/README.md      why idgen exists, for whom, and what it promises (outcomes)
 project/design/README.md       the design spine: Conventions, the requirement-id denominator, layout
 project/design/INDEX.md        manifest: each Decision → its file, plus a sorted R-id → Decision map
 project/design/DNN.md          one self-contained Decision each: seams, interfaces, and its Verification ids
 project/plan/README.md         the plan rules (one phase = one package; the done bar)
 project/plan/STATUS.md         the manifest: one ⬜/✅ line per phase, the only home of status markers
 project/plan/phase-NN.md       one body per phase: objective + the id slice it must cover
-project/prompts/{gather,build,verify}.md   the three build-loop prompts
+project/loops/{gather,build,verify}.md   the three build-loop prompts
 project/README.md              the workspace map + the full build-loop overview
 .claude/commands/              the /product-, /research-, /design-, /plan-mode and
                                /create-gather-build-verify-prompts commands that authored the spec
@@ -45,7 +45,7 @@ everything needed both to author the spec and to build from it.
 The spec is split across three authorities, and the discipline that makes it work
 is that **they never restate each other**. Each fact lives in exactly one place:
 
-- **`project/product/product.md` owns *why*:** the problem, the users, and the
+- **`project/product/README.md` owns *why*:** the problem, the users, and the
   user-facing promises, stated as outcomes. It never describes mechanism.
 - **`project/design/` owns *how*:** seams, interfaces, types, and, crucially,
   **the denominator**. Each Decision ends with a Verification list, and every item
@@ -68,7 +68,7 @@ The agent builds the project without holding anything between turns. Three promp
 run in a cycle, each in a fresh, isolated context:
 
 1. **gather** is the only prompt that reads the big docs. It finds the next `⬜`
-   phase in `STATUS.md` and writes a tiny, self-contained `project/prompts/brief.md`
+   phase in `STATUS.md` and writes a tiny, self-contained `project/loops/brief.md`
    for just that phase: the objective and the id slice to cover.
 2. **build** reads *only* that brief. It writes the code and the id-tagged tests
    (`// R-XXXX-XXXX`), then commits.

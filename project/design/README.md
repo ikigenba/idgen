@@ -2,7 +2,7 @@
 
 **Authority: shape and its proof.** This directory owns *how idgen is built* —
 seams, public interfaces, naming, types, the data model, the encoding math — and
-*how each behavior is proven*. `project/product/product.md` owns the *why* and the
+*how each behavior is proven*. `project/product/README.md` owns the *why* and the
 user-facing promises; design states the **exact, checkable form** of those
 promises and never re-declares the why. The contractual constants (the 2026 epoch
 and the version string) are the product's; design uses their values, it does not

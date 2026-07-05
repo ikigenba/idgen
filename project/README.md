@@ -14,12 +14,12 @@ loop implements it — never hand-edit generated code to add behavior.
 
 | folder | what's in it | owned by |
 |---|---|---|
-| `product/` | `product.md` — the *why*: problem, users, scope, user-facing promises, success criteria | `/product-mode` (rewritten in place) |
+| `product/` | `README.md` — the *why*: problem, users, scope, user-facing promises, success criteria | `/product-mode` (rewritten in place) |
 | `design/` | `README.md` (spine) + `INDEX.md` (manifest + sorted `R-id → Decision` map) + `DNN.md` (one per Decision) | `/design-mode` (rewritten in place) |
 | `plan/` | `README.md` (rules) + `STATUS.md` (the manifest — the only home of each phase's `⬜`/`✅` marker) + `phase-NN.md` (one per phase) | `/plan-mode` (append-only) |
 | `loops/` | the build-loop prompts `gather.md`, `build.md`, `verify.md` (+ the phase-scoped `brief.md`) | `/create-gather-build-verify-prompts` (generated) |
 
-The three **spine documents** (`product/product.md`, `design/README.md`,
+The three **spine documents** (`product/README.md`, `design/README.md`,
 `plan/README.md`) are each singular and owned by a `/*-mode` command — that command
 is the sanctioned way to change them. Product and design are **rewritten in place**
 to stay authoritative; the plan is **append-only** (it doubles as construction
