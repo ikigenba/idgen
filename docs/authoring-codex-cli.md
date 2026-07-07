@@ -99,7 +99,13 @@ invocation behind a committed wrapper so every future run is one short command.
 This is the minimal default; add your chosen harness/model flags here if needed:
 
 ```sh
-printf '#!/bin/bash\nexec ralph project/loops/gather.md project/loops/build.md project/loops/verify.md\n' > project/loops/run
+cat > project/loops/run <<'EOF'
+#!/bin/bash
+exec ralph \
+  project/loops/gather.md \
+  project/loops/build.md \
+  project/loops/verify.md
+EOF
 chmod +x project/loops/run
 project/loops/run
 ```
