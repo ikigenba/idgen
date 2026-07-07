@@ -1,0 +1,10 @@
+/bin/
+
+# Phase-scoped build-loop brief (gather authors it; verify deletes it on pass/stall)
+/project/loops/brief.md
+
+# Durable loop-position marker (external-cursor orchestration; deleted on DONE)
+/project/loops/cursor.md
+
+# Transient audit-loop state (manifest + findings; a fresh audit starts fresh)
+/project/audit/

@@ -1,0 +1,4 @@
+{
+  "preload": ["spec-shapes", "ralph", "grillme"],
+  "advertise": []
+}
