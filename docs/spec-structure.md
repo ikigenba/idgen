@@ -127,3 +127,7 @@ To make a spec change of your own, the recipe is the same in either agent:
    one pass.
 5. From a shell, run `project/loops/run` to rebuild the code from the updated
    spec.
+
+Worked examples of this recipe — both greenfield and adding a feature — live in
+[authoring with Claude Code](authoring-claude-code.md) and
+[authoring with the Codex CLI](authoring-codex-cli.md).

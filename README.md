@@ -86,6 +86,17 @@ single-prompt **audit loop** that adversarially re-checks the finished build,
 asking of every requirement id not just "is there a test?" but "could that test
 actually fail?".
 
+## Author a spec yourself
+
+The method that wrote this spec ships with the repo, so you can reuse it: spin
+up a **new project from an empty directory**, or **add a feature** to `idgen`
+by changing its spec and rebuilding. Either way it is the same five beats: load
+the spec context, describe the goal in plain English, get grilled one question
+at a time, codify, run the loop. Worked examples, one per agent:
+
+- **[Author with Claude Code](docs/authoring-claude-code.md)**
+- **[Author with the Codex CLI](docs/authoring-codex-cli.md)**
+
 New to the repo? Read **[how the spec is structured](docs/spec-structure.md)**
 first. It explains what you are actually building, why the spec is split the way it
 is, and how the gather → build → verify loop turns it into code. Every method above
