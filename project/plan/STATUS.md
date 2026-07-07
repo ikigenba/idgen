@@ -12,7 +12,7 @@ so the anchored grep matches only phase lines.
 
 - Phase 01  ⬜  realizes —          — Scaffolding: module, three seams & Makefile (structural)
 - Phase 02a ⬜  realizes D2         — internal/idgen: encode (mint direction) + Epoch
-- Phase 02b ⬜  realizes D2         — internal/idgen: decode (inverse direction) + fuzz
+- Phase 02b ⬜  realizes D2         — internal/idgen: decode (inverse direction) + randomized property sweeps
 - Phase 03a ⬜  realizes D3, D4, D5, D6  — internal/cli: mint mode (Run dispatch, wait-loop, validation, version/usage)
 - Phase 03b ⬜  realizes D4, D5  — internal/cli: decode mode
 - Phase 04  ⬜  realizes D6         — wire cmd/idgen/main + install + build smoke

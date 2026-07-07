@@ -24,13 +24,13 @@ in-memory buffers and a **fake `Clock`** (no subprocess, no real sleeps):
 *Clock seam & wait loop (D3):*
 - R-WTCF-K9DQ — fake clock (`Sleep` advances virtual `now`): `-n N` prints N distinct ids.
 - R-WUKB-Y14F — under that clock, virtual time advanced ≥ N−1 ms (the per-id wait happened).
-- R-WVS8-BSV4 — stalled clock still terminates and yields distinct ids only after `Sleep` advances it.
+- R-WVS8-BSV4 — stalled clock still terminates; the N ids are pairwise distinct with the last ms ≥ N−1 beyond the first (not just success + one `Sleep`).
 - R-WX04-PKLT — default/`N=1`: zero `Sleep` calls.
 - R-WY81-3CCI — mint from an already-elapsed instant: the id decodes to the just-read `now`.
-- R-WZFX-H437 — backward-clock tolerate: the minted sequence is non-decreasing in ms within one call.
+- R-WZFX-H437 — backward-clock tolerate: clock steps backward mid-sequence then recovers via `Sleep`; minted ms are non-decreasing **and** advance past the pre-step value (the dip is actually traversed).
 
 *Grammar, dispatch & exit codes — mint slice (D4):*
-- R-X0NT-UVTW — `--help`/`-h` → usage on stdout, exit 0.
+- R-X0NT-UVTW — `--help`/`-h` → `Usage:` line counted **exactly once** on stdout, stderr empty, exit 0 (rules out the stdlib-`flag` double print).
 - R-X1VQ-8NKL — `--version` → version string on stdout, exit 0.
 - R-X33M-MFBA — unknown flag → exit 2, stderr non-empty (flag's own parse error).
 - R-X4BJ-071Z — mint with a positional argument → exit 2 **and** stderr is

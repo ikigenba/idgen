@@ -12,7 +12,7 @@ id string for any instant at or after `Epoch`, prefix supplied by the caller.
 is covered by a clearly-named, genuinely-asserting, id-tagged test (a `//` comment
 naming the id) in `internal/idgen/*_test.go` (golden vectors **derived
 independently/offline**, not snapshotted from the code under test):
-- R-WIDC-4BPH — golden vector at `Epoch` → its exact id string (locks the 2026 epoch).
-- R-WJL8-I3G6 — golden vector mid-cycle (locks the affine constants and the 4-4 split).
+- R-WIDC-4BPH — golden vector at `Epoch` (ms 0) → its exact id string; pins the offset constant (does not lock the epoch — see R-WJL8).
+- R-WJL8-I3G6 — golden vector at a fixed absolute post-epoch instant (literal, not the `Epoch` symbol) → exact string; locks the affine constants/4-4 split **and** the 2026 epoch.
 - R-WKT4-VV6V — padding: small ms still yield 8 body chars.
 - R-WM11-9MXK — clamping: pre-Epoch instants encode as Epoch (ms 0).

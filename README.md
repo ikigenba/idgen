@@ -81,6 +81,11 @@ loop* and *how much is automated*. Pick one:
 - **[codex cli](docs/codex-cli.md)**: the same interactive loop, driven by the
   Codex CLI instead. Also a good default if Codex is your agent.
 
+Whichever path you pick, the spec also ships an optional follow-up: a
+single-prompt **audit loop** that adversarially re-checks the finished build,
+asking of every requirement id not just "is there a test?" but "could that test
+actually fail?".
+
 New to the repo? Read **[how the spec is structured](docs/spec-structure.md)**
 first. It explains what you are actually building, why the spec is split the way it
 is, and how the gather → build → verify loop turns it into code. Every method above

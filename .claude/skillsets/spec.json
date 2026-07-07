@@ -1,0 +1,6 @@
+{
+  "preload": ["spec-shapes", "ralph"],
+  "advertise": [
+    { "skill": "grillme", "description": "Interrogate the discussed goal one question at a time until shared understanding — run before /codify." }
+  ]
+}

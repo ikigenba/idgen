@@ -1,6 +1,6 @@
 ---
 name: ralph
-description: Orientation map of the ralph autonomous-build family — the two halves (interactive authoring vs unattended execution), the ralph executor, and pointers to the pieces. Load for orientation; the contracts live in the documents this map points at.
+description: "Orientation map of the ralph autonomous-build family: interactive authoring, unattended execution, the ralph executor, and pointers to the project-local skills and generated prompts. Use for orientation around ralph, project/ specs, codify, build loops, and audit loops."
 ---
 
 # Ralph
@@ -17,7 +17,7 @@ pointed at below.
 ## The two halves
 
 - **Authoring (interactive, human-in-the-loop)** — you and an agent settle the
-  `project/` spec in conversation, then a command writes it in one pass.
+  `project/` spec in conversation, then a workflow writes it in one pass.
 - **Execution (unattended, no human)** — the `ralph` binary re-runs generated
   prompt files in a loop until done. No interaction; all state lives in the
   workspace.
@@ -29,17 +29,17 @@ mechanical execution.
 
 | piece | what it is | contract lives in |
 | --- | --- | --- |
-| `spec-shapes` skill | the `project/` artifact contracts: product, research, design, plan shapes + hard invariants | `.claude/library/spec-shapes/SKILL.md` |
-| `grillme` skill | generic one-question-at-a-time interrogation, used to sharpen the goal before writing | `.claude/library/grillme/SKILL.md` |
-| `/codify` command | the "go do the work" step: one automated pass writing product/research/design/plan per `spec-shapes` | `.claude/commands/codify.md` |
-| `/create-*-prompts` commands | loop generators; each emits one loop topology (e.g. `/create-gather-build-verify-prompts`) + `project/loops/README.md` describing the installed loop | `.claude/commands/create-*-prompts.md` |
+| `$spec-shapes` skill | the `project/` artifact contracts: product, research, design, plan shapes + hard invariants | `.agents/skills/spec-shapes/SKILL.md` |
+| `$grillme` skill | generic one-question-at-a-time interrogation, used to sharpen the goal before writing | `.agents/skills/grillme/SKILL.md` |
+| `$codify` skill | the "go do the work" step: one automated pass writing product/research/design/plan per `spec-shapes` | `.agents/skills/codify/SKILL.md` |
+| prompt-generator skills | loop generators; each emits one loop topology (e.g. `$create-gather-build-verify-prompts`) + `project/loops/README.md` describing the installed loop | `.agents/skills/create-*/SKILL.md` |
 | `project/` | the spec itself — the single source of truth the loop builds from | `project/README.md` (the workspace map) |
 | `project/loops/` | the generated prompts + the installed loop's overview | `project/loops/README.md` |
 | `ralph` binary | the executor | `~/projects/ralph/README.md` |
 
 The spec shapes and the loop topologies are **independent**: generators consume
 the spec structure but the spec knows nothing about any particular loop. New
-loop families (different prompt sequences) are new generator commands; the spec
+loop families (different prompt sequences) are new generator workflows; the spec
 contracts don't change.
 
 ## The workflow
@@ -49,11 +49,11 @@ Every session is the same three beats, greenfield or brownfield:
 ```
 converse (user story / constraints; research as needed)
    │
-/load grillme        interrogate to shared understanding
+$grillme             interrogate to shared understanding
    │
-/codify              one pass: product · research · design (mint ids) · plan (append phases)
+$codify              one pass: product · research · design (mint ids) · plan (append phases)
    │
-/create-gather-build-verify-prompts     (once per project, or when the loop design changes)
+$create-gather-build-verify-prompts     (once per project, or when the loop design changes)
    │
 ralph project/loops/gather.md project/loops/build.md project/loops/verify.md
                      (operator-launched, unattended: gather ─► build ─► verify ─► …)

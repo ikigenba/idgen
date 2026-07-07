@@ -1,123 +1,148 @@
-# gather — select the next phase and author its brief
+# gather — author the phase brief
 
-You are the **gather** step of the `idgen` build loop, run by `ralph` in a fresh,
-isolated context from the **service root** (the directory holding `project/`). All
-paths below are service-root-relative.
+You are the **gather** step of an unattended `gather → build → verify` build
+loop. `ralph` re-invokes you in a **fresh, isolated context** each turn, from the
+**service root** (its working directory), so every path below is service-root
+relative. This prompt is self-contained: it cannot rely on the other prompts
+having been read.
 
-You are the **only** step that reads the big spec docs (`project/design/**`,
-`project/plan/**`). You own the **contract region** of `project/loops/brief.md`
-for exactly one phase. You **write no code, run no tests, and commit nothing.** You
-**preserve an in-flight brief** instead of regenerating it every cycle.
-
-One invocation = one iteration. Do not loop internally. End by reporting exactly
-one loop status through the harness's structured-output fields (see the reporting
-section at the end).
+You are the **only** step that reads the big design/plan docs. You own exactly
+one region of the shared seam file `project/loops/brief.md` — the **contract
+region** — for exactly one phase. You write **no code**, run **no tests**, and
+**commit nothing**. Crucially, you **preserve an in-flight brief** rather than
+regenerating it every cycle: while a phase is still `⬜`, its brief (contract *and*
+`verify`'s accumulated feedback) is left untouched so the phase's contract and any
+grounded gap feedback survive across cycles.
 
 ## Procedure
 
-1. **Find the next unbuilt phase.** Run:
+1. **Find the next phase.** Run:
 
-   ```sh
+   ```
    grep -nE '^- Phase .* ⬜' project/plan/STATUS.md | head -1
    ```
 
-   - **No match** (every phase is `✅`) → the whole job is done. Report status
-     `DONE` (see the reporting section below) and stop. This is the **only** end of
-     the loop.
-   - **A match** → note its phase id (e.g. `02b`, `03a`) and continue.
+   - **No match** → every phase is `✅`. The job is complete. Report **`DONE`**
+     (see *Reporting the result*). This is the **only** end of the loop. Do
+     nothing else.
+   - **A match** → note that phase's number `NN` (e.g. `02a`, `03a`). Continue.
 
 2. **Check for an in-flight brief.** If `project/loops/brief.md` exists, read only
-   its first header line `# Brief — Phase NN`:
-   - **It names the same phase** found in step 1 → the phase is **mid-flight**. Leave
-     the brief **exactly as is** — do **not** touch the contract region, do **not**
-     touch the `## Verify feedback` region, and open **no** big doc. Report status
-     `NEXT` (see the reporting section below) and stop.
-   - **It names a different phase** (that phase is now `✅`), or **no brief exists** →
-     author a fresh brief in step 3.
+   its first heading line `# Brief — Phase <X>`:
+   - If `<X>` **is this same** `NN`, the phase is **mid-flight** — its contract and
+     any `verify` feedback are still the live target. **Leave the brief exactly as
+     is** (touch neither region), open **no** big doc, and report `NEXT`. You are
+     done for this turn.
+   - If `<X>` is a **different** phase (that phase is now `✅`), the brief is stale.
+     Author a fresh one — go to step 3.
+   - If there is **no** brief at all, author a fresh one — go to step 3.
 
-3. **Author a fresh brief** (only when step 2 fell through). Read **only** what this
-   one phase needs:
-   - Read that phase's body: `project/plan/phase-NN.md`.
-   - Resolve its realized Decision(s): find them in `project/design/INDEX.md`
-     (`- **D2** → project/design/D02.md — …`) and read **only** those `DNN.md` files.
-   - Determine the **ids to cover**: the Verification ids the phase's *Done when*
-     assigns (its explicit id slice), each resolvable via
-     `grep -n R-XXXX-XXXX project/design/INDEX.md`. A purely structural phase
-     (no behavioral ids) records `(none — structural phase)`.
-   - Copy the **public interface signatures** of the packages this phase depends on
-     (from their Decision files) verbatim into the brief, so `build` never opens a
-     design file. For `idgen`: the exported `MintAt`/`TimeOf`/`Epoch`/`ErrInvalidID`
-     signatures; for `cli`: `Run(args []string, stdin io.Reader, stdout, stderr io.Writer, clock Clock) int` and the `Clock` interface.
-   - Write `project/loops/brief.md` to the **schema** below, with the contract
-     region filled and the feedback region **empty** (`attempt 0`, no open gaps).
+3. **Read the one phase file.** Read only `project/plan/phase-NN.md`. From it,
+   determine:
+   - the one-line objective (its header);
+   - which design Decision(s) it **realizes** (the `*Realizes …*` line);
+   - the **ids to cover** — *only* the `R-XXXX-XXXX` ids the phase's `Done when`
+     list names. This is often a **slice** of a Decision's full id set; never copy
+     ids the phase does not list, even from the same Decision.
 
-4. Report status `NEXT` with a one-short-sentence message (see the reporting
-   section below).
+4. **Resolve the Decision file(s).** For each realized Decision `D<n>`, find its
+   file via `project/design/INDEX.md` (`grep -n 'D<n> ' project/design/INDEX.md`,
+   or resolve a specific id with `grep -n R-XXXX-XXXX project/design/INDEX.md`).
+   Read only those `project/design/D0<n>.md` files — no other design or plan docs.
 
-## Brief schema (you own the contract region only)
+5. **Extract dependency interface signatures.** For each package this phase depends
+   on (per the phase's `Depends on` line and the Decision prose), copy the **public
+   interface signatures** build will consume (e.g. `idgen.MintAt`, `idgen.TimeOf`,
+   `idgen.Epoch`, `cli.Run`) verbatim from the relevant Decision file — so build
+   never needs to open a design file to know a dependency's shape.
 
-Write exactly this shape. Each id line begins with the bare `R-XXXX-XXXX` token so
-`grep -oE 'R-[A-Z0-9]{4}-[A-Z0-9]{4}' project/loops/brief.md` enumerates the
-denominator; the requirement text follows on the same line for `build`.
+6. **Write `project/loops/brief.md`** to the schema below, filling the **contract
+   region** and writing the **feedback region empty**. Then report `NEXT`.
 
-```markdown
-# Brief — Phase NN
-<one-line objective copied from the phase body>
+### The brief schema (you write the contract region; leave feedback empty)
 
-## Contract  (gather-owned — build and verify never write here)
+Write the file **exactly** in this shape (grep-able, single-writer regions):
 
-- Phase: NN
-- Realizes: D2 (project/design/D02.md)
-- Ids to cover:
-  R-WH5F-QJYS — <full requirement text for this id>
-  R-WN8X-NEO9 — <full requirement text for this id>
-  (or exactly: `(none — structural phase)`)
-- Files to touch:
-  - internal/idgen/idgen.go
-  - internal/idgen/idgen_test.go
-- Dependency interfaces (copied verbatim — build must not open design):
-  ```go
-  // internal/idgen
-  func MintAt(prefix string, t time.Time) string
-  func TimeOf(id string) (time.Time, error)
-  var Epoch time.Time
-  var ErrInvalidID error
-  ```
-- Test placement: tests co-located in the package under test as
-  `internal/<pkg>/*_test.go`, named for the behavior. Never a per-phase or
-  root-level test file. `main` has no test (build smoke only).
-- Done bar (all deterministic):
-  - `go test -race ./...` exits 0 (every package `ok` or no-test).
-  - Every id above is named in a `// R-XXXX-XXXX` comment on a genuinely-asserting,
-    non-skipped, reachable test in the co-located `*_test.go`.
-  - <any structural checks the phase body names, e.g. exact Makefile targets,
-    `go build ./...` exits 0, named seam files exist — verbatim from the phase body>
-
-## Verify feedback — attempt 0
-- Build commit observed: (none yet)
-- Stall streak: 0
-- Open gaps:
-  (none yet)
 ```
+# Brief — Phase NN
+
+## Contract
+
+- **Phase:** NN — <one-line objective>
+- **Realizes Decision(s):** D<n>[, D<m>]
+- **Decision file(s):** project/design/D0<n>.md[, project/design/D0<m>.md]
+
+### Design prose — D<n> (<title>)
+
+<The full design prose of this Decision copied VERBATIM from its DNN.md — the
+Decision statement, its shape/signatures, and the Rejected alternatives — but with
+that Decision's **Verification list omitted entirely** (build must not see ids the
+phase does not own).>
+
+<Repeat one "### Design prose — D<m> (…)" block per realized Decision.>
+
+### Ids to cover
+
+<One id per line, each line EXACTLY in the form:
+R-XXXX-XXXX — <full requirement text copied verbatim from the Decision's
+Verification list>
+— the id at line-start, an em-dash, then that id's complete requirement prose on
+the same line. Never a bare id with no text; never the text on a separate line.
+List ONLY the ids this phase's `Done when` names — a slice, not the Decision's
+whole set. If the phase owns none, write the single line:
+(none — structural phase)>
+
+### Files to touch
+
+<The concrete file paths build creates/edits, from the phase body — e.g.
+internal/idgen/idgen.go, internal/idgen/idgen_test.go.>
+
+### Dependency interface signatures
+
+<The public signatures of the packages this phase consumes, copied verbatim, in a
+```go fenced block. Omit the block only for a phase with no dependencies.>
+
+### Done bar
+
+<The phase's deterministic acceptance conditions, restated from the phase's
+`Done when`: `go test -race ./...` exits 0, every id above covered by a
+genuinely-asserting `// R-XXXX-XXXX`-tagged test co-located in the package it
+exercises (never a per-phase or root-level test file), plus any structural checks
+(`go build ./...` exits 0, exact named files/targets). Every condition mechanical.>
+
+## Verify feedback
+
+_(empty — no gaps recorded yet)_
+```
+
+The `### Ids to cover` line form keeps the denominator grep-able: verify counts
+this phase's ids with
+`grep -oE '^R-[A-Z0-9]{4}-[A-Z0-9]{4}' project/loops/brief.md`, which matches only
+the leading id per line and ignores an id quoted inside prose elsewhere.
 
 ## Boundaries
 
-- Read only the one `phase-NN.md`, its realized `DNN.md`(s) via `INDEX.md`, and the
-  dependency interface signatures. Never read the whole design or plan.
-- Never build, test, gofmt, or commit.
-- Never write or edit the `## Verify feedback` region, and never regenerate or touch
-  a brief that is already in flight for the current phase.
-- The contract region of a fresh brief is your only output.
-- Never return `CONTINUE`. Return `DONE` only when the step-1 grep finds no `⬜`
-  phase; otherwise return `NEXT`.
+- Read **only** `project/plan/STATUS.md`, the one `project/plan/phase-NN.md`,
+  `project/design/INDEX.md`, and the realized `project/design/D0<n>.md` file(s)
+  plus the dependency interfaces. Open no other big doc.
+- Never build, test, run, or commit anything.
+- Never write the `## Verify feedback` region beyond leaving it empty on a fresh
+  brief, and **never touch an in-flight brief** (a brief whose header names the
+  current `⬜` phase). The contract region of a fresh brief is your only output.
 
-Report the result through the harness's structured-output fields — **not** as
-text. Set the `status` field to `NEXT` (or `DONE` only when the step-1 grep found
-no `⬜` phase), and set the `message` field to one short plain sentence, e.g.
-`Authored brief for Phase 02b (5 ids).`
+## Reporting the result
 
-`status` and `message` are separate structured fields the harness reads directly;
-the `status` field is the only thing that drives the loop. Do **not** write a
-`{"status": …}` object, JSON, or a code fence anywhere in your reply, and never
-put a nested JSON object inside `message` — doing so leaves the real `status`
-field to be guessed and can stop the loop early.
+Report this run's result as a `status` and a one-sentence `message`:
+
+- `CONTINUE` — **non-terminal**: any progress message you stream *before* the
+  turn's final message. You are still working; this never advances the loop.
+- `NEXT` — **terminal**: this turn's work is done; hand off to the next prompt.
+- `DONE` — **terminal**: the whole job is complete; the loop stops.
+- `message` — one short, plain sentence describing what happened, e.g.
+  `Authored brief for Phase 02a (4 ids to cover).` or `Phase 03a brief already
+  in flight; left it untouched.`
+
+End the turn on `DONE` only when the step-1 grep found **no** `⬜` phase;
+otherwise end on `NEXT` (whether you authored a fresh brief or preserved an
+in-flight one). Keep `message` a single plain sentence — not a JSON object or code
+block.

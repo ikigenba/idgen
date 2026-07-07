@@ -89,3 +89,9 @@ make build      # compile to bin/idgen
 make test       # go test ./...
 make install    # go install ./cmd/idgen (onto your PATH via GOBIN)
 ```
+
+The spec also ships an optional single-prompt **audit loop**
+(`project/loops/audit.md`) that adversarially re-checks the finished build's test
+coverage. It runs the same way — a subagent per turn, cycling the one prompt until
+`DONE` — and is documented in
+[`project/loops/README.md`](../project/loops/README.md).

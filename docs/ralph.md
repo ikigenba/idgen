@@ -25,12 +25,20 @@ This method needs:
 
 ## Steps
 
-Clone the repo and, **from the repository root**, run `ralph` against this spec's
-three build-loop prompts:
+Clone the repo and, **from the repository root**, run the committed wrapper,
+which launches `ralph` on this spec's three build-loop prompts with the harness
+and model the project builds with:
 
 ```sh
 git clone https://github.com/ikigenba/idgen.git
 cd idgen
+project/loops/run
+```
+
+To use a different harness or model, invoke `ralph` directly with your own
+flags:
+
+```sh
 ralph project/loops/gather.md project/loops/build.md project/loops/verify.md
 ```
 
@@ -55,3 +63,7 @@ make install    # go install ./cmd/idgen (onto your PATH via GOBIN)
   `project/` spec they read resolve correctly.
 - `ralph` owns the lifecycle and the budget rails (`--max-spend`, `--max-time`, …);
   run `ralph --help` for the flags.
+- After a build, an optional single-prompt **audit loop** —
+  `ralph project/loops/audit.md` — adversarially re-checks that every requirement
+  id is proven by a test that could actually fail. See
+  [`project/loops/README.md`](../project/loops/README.md).

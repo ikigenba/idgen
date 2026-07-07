@@ -22,7 +22,11 @@ removed, not stacked). History of how it got here lives in `project/plan/`.
 - **That set of ids is the denominator** — the enumerated intent the test suite is
   measured against. A behavior is **covered** when a test asserts it *and names its
   id in a `// R-XXXX-XXXX` comment*, so coverage is a grep, not a separate
-  cross-reference.
+  cross-reference. A single `//` comment may carry **several comma-separated ids**
+  when one assertion proves more than one behavior (e.g. `--version` printing
+  exactly `v0.1.0` on stdout with exit 0 proves both the dispatch id and the
+  version-constant id); coverage matches an id anywhere in a `//` comment, not only
+  immediately after the slashes.
 - The work is **done** when every Verification id is covered and
   `go test -race ./...` is green. The denominator stays honest by being pruned:
   remove a requirement here and you remove its id and its test. Ids are minted
@@ -64,7 +68,8 @@ Shared facts every Decision leans on:
   clock, no I/O), and the whole CLI sits behind one injectable
   `cli.Run(args, stdin, stdout, stderr, clock) int`. Every behavior is reachable
   **in-process and deterministic** — no subprocess, no real sleeps: `idgen` proves
-  its requirements with unit + fuzz tests at zero process setup; `cli` proves its
+  its requirements with unit + randomized property tests at zero process setup;
+  `cli` proves its
   requirements through in-memory `args`/`stdin`/`stdout` buffers, a return code, and
   a **fake `Clock`** whose `Sleep` advances virtual time; `main` has no logic and
   carries no requirement (a build smoke check stands in for it).

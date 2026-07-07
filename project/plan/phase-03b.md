@@ -25,7 +25,7 @@ in-memory buffers:
 *Input handling & validation — decode slice (D5):*
 - R-X974-JA0R — decode from positional args: one UTC line per id, in order.
 - R-XAF0-X1RG — decode from stdin (mixed whitespace) matches the args case.
-- R-XBMX-ATI5 — positionals win when both positionals and stdin are present.
+- R-XBMX-ATI5 — positionals win: with a stdin reader that fails if read, decode uses only positionals and stdin is never read (a `Read` call fails the test).
 - R-XCUT-OL8U — one malformed token: good ids still decode, error names the bad token, exit 1.
 - R-XE2Q-2CZJ — empty decode (no args, empty stdin): no output, exit 0.
 - R-XFAM-G4Q8 — round-trip through `Run`: `--decode` of a freshly minted id returns its minting instant.

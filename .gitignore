@@ -5,3 +5,6 @@
 
 # Durable loop-position marker (external-cursor orchestration; deleted on DONE)
 /project/loops/cursor.md
+
+# Transient audit-loop state (manifest + findings; a fresh audit starts fresh)
+/project/audit/

@@ -29,16 +29,19 @@ project/plan/README.md         the plan rules (one phase = one package; the done
 project/plan/STATUS.md         the manifest: one ⬜/✅ line per phase, the only home of status markers
 project/plan/phase-NN.md       one body per phase: objective + the id slice it must cover
 project/loops/{gather,build,verify}.md   the three build-loop prompts
-project/README.md              the workspace map + the full build-loop overview
-.claude/commands/              the /product-, /research-, /design-, /plan-mode and
-                               /create-gather-build-verify-prompts commands that authored the spec
-.claude/library/ralph/         the ralph family map skill
+project/loops/audit.md         the single prompt of the separate, optional coverage-audit loop
+project/loops/run              the operator entrypoint: a shell wrapper that launches ralph on the build loop
+project/loops/README.md        the installed loops' overview: status contract, state machine, brief schema
+project/README.md              the workspace map (thin: the folder table + pointers)
+.claude/                       the spec-process skills and commands, packaged for Claude Code
+.agents/skills/                the same spec-process skills, packaged for the Codex CLI
 ```
 
-The `.claude/` commands and skill are version-controlled and ship with the repo on
-purpose: the same interactive commands that produced this contract travel with it,
-so the *method* is reproducible, not just its output. Clone the project and you have
-everything needed both to author the spec and to build from it.
+The workflow tooling is version-controlled and ships with the repo on purpose,
+packaged for both Claude Code (`.claude/`) and the Codex CLI (`.agents/skills/`):
+the same method that produced this contract travels with it, so the *method* is
+reproducible, not just its output. Clone the project and you have everything
+needed both to author the spec and to build from it, with either agent.
 
 ## Three authorities, one fact each
 
@@ -84,15 +87,43 @@ remember what happened last turn.
 The build methods differ only in what *drives* this cycle: an unattended harness,
 or you pasting a prompt into an interactive agent. The contract they read, and the
 `DONE` they drive toward, are identical. See
-[`project/README.md`](../project/README.md) for the authoritative build-loop
-overview: the status contract, the state machine, and the brief schema.
+[`project/loops/README.md`](../project/loops/README.md) for the authoritative
+build-loop overview: the status contract, the state machine, and the brief schema.
+
+## The audit loop: adversarial coverage checking (optional)
+
+Verify already gates each phase, but it asks "is every id covered by a test?"
+A separate, single-prompt loop (`project/loops/audit.md`) asks the harder
+question after the build: **could each tagged test actually fail?** It walks the
+design one Decision at a time, judges every `R-XXXX-XXXX` id's test against the
+behavior the design states (escalating to a throwaway-worktree mutation test
+when reading can't settle it), and writes its findings to a gitignored
+`project/audit/REPORT.md`. It never modifies the live checkout. It is run on
+demand — `ralph project/loops/audit.md` — and is documented alongside the build
+loop in [`project/loops/README.md`](../project/loops/README.md).
 
 ## How the spec itself was authored
 
-The contract was not written by hand in one sitting. It was authored interactively,
-one decision at a time, by the `/*-mode` commands in
-[`.claude/commands/`](../.claude/commands/), running product → research → design →
-plan, with the loop prompts written by `/create-gather-build-verify-prompts`. Build
-and verify are not authoring steps; they belong to the build loop. That the
-authoring commands ship with the repo is the point: the *method* is meant to be
-reused, not just the `idgen` it produced.
+The contract was not written by hand in one sitting. It was settled interactively —
+the goal discussed in conversation, then interrogated one question at a time with
+the `grillme` workflow — and written in one pass by the `codify` workflow, to the
+artifact shapes defined in the `spec-shapes` skill, with the loop prompts generated
+by `create-gather-build-verify-prompts` and `create-audit-prompts`. Build and
+verify are not authoring steps; they belong to the build loop. Those workflows ship
+with the repo for both agents — as skills and commands under
+[`.claude/`](../.claude/) for Claude Code, and as skills under
+[`.agents/skills/`](../.agents/skills/) for the Codex CLI — and that is the point:
+the *method* is meant to be reused, not just the `idgen` it produced.
+
+To make a spec change of your own, the recipe is the same in either agent:
+
+1. Start a session with the spec-process context loaded — `/skillset spec` in
+   Claude Code, or `use $spec-shapes` in Codex. (Codex has no slash commands;
+   its shipped skills are invoked by `$name` reference: `$grillme`, `$codify`.)
+2. Describe the change in plain English.
+3. Run `grillme` and answer its questions, one at a time, until the goal is
+   settled.
+4. Ask the agent to `codify` — it writes product, research, design, and plan in
+   one pass.
+5. From a shell, run `project/loops/run` to rebuild the code from the updated
+   spec.
