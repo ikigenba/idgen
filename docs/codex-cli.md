@@ -50,16 +50,15 @@ Keeps the loop position in `project/loops/cursor.md`, so the build is resumable.
   marker. Each iteration: read cursor.md for the current step; if it is missing or
   empty, the current step is gather. Spawn a Codex subagent to read and execute that
   step's prompt file (./project/loops/{gather,build,verify}.md); it ends by
-  emitting a single JSON object of the form {"status": ..., "message": ...}. Parse
-  its "status" and relay its "message" so progress stays visible, then act:
+  reporting a status and one-sentence message. Parse its final reported status and
+  relay its message so progress stays visible, then act:
   CONTINUE -- leave cursor.md unchanged and continue the goal with the same step.
   NEXT -- write the next step in the cycle to cursor.md and continue the goal.
   DONE -- delete cursor.md and stop the goal. If a subagent fails, or its final
-  output is not a JSON object carrying a "status" of exactly CONTINUE, NEXT, or
-  DONE, stop and surface the raw output -- never guess a status, and leave cursor.md
-  unchanged. You are only the orchestrator: you read and write cursor.md for
-  bookkeeping, but never read the prompt files themselves -- subagents read and
-  execute those.
+  output does not clearly report exactly CONTINUE, NEXT, or DONE, stop and surface
+  the raw output -- never guess a status, and leave cursor.md unchanged. You are
+  only the orchestrator: you read and write cursor.md for bookkeeping, but never
+  read the prompt files themselves -- subagents read and execute those.
 ```
 
 ### Internal cursor (easier to reason about)
@@ -70,12 +69,12 @@ Keeps the loop position in the orchestrator's context and runs to `DONE` in one 
 /goal Cycle the prompt sequence gather -> build -> verify (verify wraps back to gather),
   starting at gather, until a subagent returns a DONE status. For each step, spawn a
   Codex subagent to read and execute the current prompt file
-  (./project/loops/{gather,build,verify}.md); it ends by emitting a single JSON
-  object of the form {"status": ..., "message": ...}. Parse its "status" and relay
-  its "message" so progress stays visible. CONTINUE -- re-run the same prompt file.
+  (./project/loops/{gather,build,verify}.md); it ends by reporting a status and
+  one-sentence message. Parse its final reported status and relay its message so
+  progress stays visible. CONTINUE -- re-run the same prompt file.
   NEXT -- advance to the next prompt file (verify wraps to gather). DONE -- stop. If
-  a subagent fails, or its final output is not a JSON object carrying a "status" of
-  exactly CONTINUE, NEXT, or DONE, stop and surface the raw output -- never guess a
+  a subagent fails, or its final output does not clearly report exactly CONTINUE,
+  NEXT, or DONE, stop and surface the raw output -- never guess a
   status. You are only the orchestrator -- never read the prompt files yourself;
   subagents read and execute them.
 ```

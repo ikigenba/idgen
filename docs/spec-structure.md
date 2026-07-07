@@ -2,9 +2,10 @@
 
 This repository is a spec, not a program. Before you pick a build method, it helps
 to understand *what* you are handing an agent and *why* it is shaped the way it is.
-This page is the tour. It is deliberately narrative; for the authoritative, terse
-version of the same mechanics, see [`project/README.md`](../project/README.md),
-which every build method reads from.
+This page is the tour. It is deliberately narrative; the authoritative spec
+shapes live in the `spec-shapes` skill, while
+[`project/README.md`](../project/README.md) is the thin workspace map every build
+method starts from.
 
 ## The idea in one paragraph
 
@@ -121,8 +122,9 @@ To make a spec change of your own, the recipe is the same in either agent:
    Claude Code, or `use $spec-shapes` in Codex. (Codex has no slash commands;
    its shipped skills are invoked by `$name` reference: `$grillme`, `$codify`.)
 2. Describe the change in plain English.
-3. Run `grillme` and answer its questions, one at a time, until the goal is
-   settled.
+3. Get grilled and answer the questions, one at a time, until the goal is
+   settled. (In Claude Code the grillme workflow rides along with
+   `/skillset spec` — just ask to be grilled; in Codex, invoke `$grillme`.)
 4. Ask the agent to `codify` — it writes product, research, design, and plan in
    one pass.
 5. From a shell, run `project/loops/run` to rebuild the code from the updated

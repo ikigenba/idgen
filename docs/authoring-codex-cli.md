@@ -95,8 +95,8 @@ coverage-audit prompt.
 ### 7. First run
 
 From a shell, launch `ralph` on the three prompts. By convention, put the
-invocation behind a one-line committed wrapper so every future run is one short
-command:
+invocation behind a committed wrapper so every future run is one short command.
+This is the minimal default; add your chosen harness/model flags here if needed:
 
 ```sh
 printf '#!/bin/bash\nexec ralph project/loops/gather.md project/loops/build.md project/loops/verify.md\n' > project/loops/run

@@ -50,12 +50,13 @@ Just talk. A paragraph is plenty to start:
 
 ### 4. Get grilled
 
-```
-/load grillme
-```
+The grillme workflow is already loaded (it rides along with `/skillset spec`),
+so just ask:
 
-Then ask to be grilled. The agent interrogates one question at a time, each
-with a recommendation attached, until the goal is settled:
+> grill me on this
+
+The agent interrogates one question at a time, each with a recommendation
+attached, until the goal is settled:
 
 > **Q:** Should grump preserve the input ordering, or sort lines before
 > grumbling? I recommend preserving order — it keeps the tool composable in
@@ -91,8 +92,8 @@ coverage-audit prompt.
 ### 7. First run
 
 From a shell, launch `ralph` on the three prompts. By convention, put the
-invocation behind a one-line committed wrapper so every future run is one short
-command:
+invocation behind a committed wrapper so every future run is one short command.
+This is the minimal default; add your chosen harness/model flags here if needed:
 
 ```sh
 printf '#!/bin/bash\nexec ralph project/loops/gather.md project/loops/build.md project/loops/verify.md\n' > project/loops/run
@@ -112,7 +113,7 @@ Same beats, existing spec — this works identically on the project above or on
 1. Start `claude` at the repo root and load the context: `/skillset spec`.
 2. Describe the change in plain English: *"grump should also take a
    `--mood MOOD` flag that picks the complaint register."*
-3. `/load grillme`, answer the questions until settled.
+3. Ask to be grilled, answer the questions until settled.
 4. `/codify`. The differences from greenfield are worth noticing: product and
    design are **rewritten in place** to the new current truth, **fresh ids are
    minted only for the new behaviors**, and the plan is **appended** — a new

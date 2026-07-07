@@ -49,7 +49,7 @@ Every session is the same three beats, greenfield or brownfield:
 ```
 converse (user story / constraints; research as needed)
    │
-/load grillme        interrogate to shared understanding
+grillme              interrogate to shared understanding (preloaded by /skillset spec)
    │
 /codify              one pass: product · research · design (mint ids) · plan (append phases)
    │
