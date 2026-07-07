@@ -38,3 +38,7 @@ state machine, and the `brief.md` schema — is documented beside the prompts, i
 ```
 ralph project/loops/gather.md project/loops/build.md project/loops/verify.md
 ```
+
+By convention the committed wrapper `project/loops/run` issues that invocation
+with the operator's chosen harness/model flags baked in, so the build launches
+with one short command.

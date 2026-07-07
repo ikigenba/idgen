@@ -59,6 +59,10 @@ ralph project/loops/gather.md project/loops/build.md project/loops/verify.md
                      (operator-launched, unattended: gather ─► build ─► verify ─► …)
 ```
 
+By convention the committed wrapper `project/loops/run` issues that full `ralph`
+invocation (with the operator's chosen harness/model flags), so launching the
+build is just `project/loops/run` — a typing-saver, nothing more.
+
 ## The executor — `ralph` (`~/projects/ralph`)
 
 A Go binary that runs a sequence of prompt files, each as a clean-context agent

@@ -12,6 +12,10 @@ live in the `spec-shapes` skill and are not restated here.
 ralph project/loops/gather.md project/loops/build.md project/loops/verify.md
 ```
 
+By convention the committed wrapper `project/loops/run` issues exactly this
+invocation with the operator's chosen harness/model flags baked in — a
+typing-saver, nothing more.
+
 `ralph` runs from the **service root** (its working directory), hands the three
 prompt paths in order, and re-invokes each in a **fresh, isolated context** every
 turn. All loop state lives in the workspace — chiefly the ephemeral
