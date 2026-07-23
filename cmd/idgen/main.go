@@ -15,6 +15,10 @@ func (systemClock) Now() time.Time {
 	return time.Now()
 }
 
+func (systemClock) Sleep(d time.Duration) {
+	time.Sleep(d)
+}
+
 func main() {
 	os.Exit(cli.Run(
 		os.Args[1:],

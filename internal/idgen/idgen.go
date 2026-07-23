@@ -39,12 +39,6 @@ func mustModInverse(value, modulus *big.Int) *big.Int {
 	return inverse
 }
 
-// Clock supplies the current time to CLI callers. The idgen core never reads
-// from a Clock; minting remains a pure function of its arguments.
-type Clock interface {
-	Now() time.Time
-}
-
 // MintAt returns "<prefix>-XXXX-XXXX" for t. Times before Epoch are clamped
 // to Epoch. Prefix is trusted to be a non-empty run of letters and digits.
 func MintAt(prefix string, t time.Time) string {
