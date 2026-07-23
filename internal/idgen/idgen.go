@@ -28,10 +28,15 @@ var (
 )
 
 func init() {
-	multiplierInverse = new(big.Int).ModInverse(big.NewInt(multiplier), modulus)
-	if multiplierInverse == nil {
+	multiplierInverse = mustModInverse(big.NewInt(multiplier), modulus)
+}
+
+func mustModInverse(value, modulus *big.Int) *big.Int {
+	inverse := new(big.Int).ModInverse(value, modulus)
+	if inverse == nil {
 		panic("idgen: multiplier is not invertible modulo 36^8")
 	}
+	return inverse
 }
 
 // Clock supplies the current time to CLI callers. The idgen core never reads
