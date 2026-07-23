@@ -1,15 +1,23 @@
 # idgen — Plan
 
-**Authority: construction order and history.** This document and the
-`project/plan/` directory it heads own the **order idgen is built in** and the
-**record of what has been built** — nothing else (the *why* is product's, the
-*shape and its proof* is design's). Unlike product and design — which are rewritten
-in place to stay authoritative for the current state — the plan is **append-only**:
-completed phases are never rewritten or deleted, so the plan doubles as the
-construction history. To extend idgen: update `project/product/README.md` and
-`project/design/` **in place** first, then **append** a new phase — a new
-`project/plan/phase-NN.md` body plus a new line in `project/plan/STATUS.md`. Never
-edit a finished phase except to flip its status marker in `STATUS.md`.
+**Authority: construction order.** This document and the `project/plan/`
+directory it heads own the **order idgen is built in** — a work queue of
+**pending** phases only, nothing else (the *why* is product's, the *shape and its
+proof* is design's). The plan holds no finished work: when a phase completes the
+build loop **deletes** its `STATUS.md` line and its `project/plan/phase-NN.md` in
+the completion commit, so the queue can never contradict a design that has since
+moved on. **Completion is deletion — there is no `✅` state on disk; the record of
+what was built lives in git** (the completion commits, and the deleted files
+recoverable there), never here. To extend idgen: update
+`project/product/README.md` and `project/design/` **in place** first, then
+**append** a new phase — a new `project/plan/phase-NN.md` body plus a new
+`project/plan/STATUS.md` line, numbered from the `Next phase` counter. Phase
+numbers are **never renumbered and never reused**.
+
+**Coverage invariant.** Every *current* design Verification id (`R-XXXX-XXXX`) is
+either already **realized** — its id appearing as a tag in a test that runs under
+the suite — or assigned to **exactly one** pending phase: none unassigned, none
+split, none duplicated across pending phases.
 
 **One phase = one package = one build-turn context.** Each phase is a single
 coherent unit of work — almost always one Go package — scoped to that unit's
@@ -42,17 +50,19 @@ claim.
 The plan is physically split so the build loop reads only the one unit of work it
 needs, never the whole history:
 
-- **`project/plan/STATUS.md`** — the manifest: one line per phase in build order,
-  and the **only** home of status markers (`✅` done / `⬜` not started). The loop
-  finds its next work with
-  `grep -nE '^- Phase .* ⬜' project/plan/STATUS.md | head -1` and reads only that
-  phase's body file.
+- **`project/plan/STATUS.md`** — the manifest: the `Next phase: NN` counter plus
+  one line per **pending** phase in build order, the **only** home of the `⬜`
+  markers. The loop finds its next work with
+  `grep -nE '^- Phase .* ⬜' project/plan/STATUS.md | head -1`, reads only that
+  phase's body file, and on completion deletes that phase's line.
 - **`project/plan/phase-NN.md`** — one body file per phase (zero-padded; a
   sub-phase keeps its suffix, e.g. `phase-03a.md`). Carries **no** status marker
   of its own.
 - **`project/plan/README.md`** — this file: the static rules above. It lists no
   phases and carries no status, so it never grows with the project.
 
-**Append-only, for this layout:** never rewrite or delete a `phase-NN.md`, never
-delete a `STATUS.md` line. The only build-time mutation is flipping one phase's
-`⬜ → ✅` in `STATUS.md`.
+**Completion is deletion, for this layout:** the build loop's only mutations are
+removing a finished phase's `STATUS.md` line together with its `phase-NN.md` in the
+completion commit. The `Next phase` counter is never decremented and a number is
+never reused, so a phase number names one phase forever even after its files are
+gone.

@@ -38,9 +38,10 @@ Requires Go 1.26+ and a `ralph`-supported agent. Always run from the repo root.
   `INDEX.md`. Each Decision ends with a Verification list of minted `R-XXXX-XXXX`
   ids. **That id set is the requirement denominator** — there is no separate
   requirements doc.
-- `project/plan/` — construction order: one `phase-NN.md` per package of work.
-- `project/plan/STATUS.md` — the manifest and the **only** home of the `⬜`/`✅`
-  phase markers.
+- `project/plan/` — construction order: a queue of one `phase-NN.md` per **pending**
+  package of work; completed phases are deleted, so history lives in git, not here.
+- `project/plan/STATUS.md` — the manifest: the `Next phase` counter and the **only**
+  home of the `⬜` phase markers.
 - `project/loops/` — the generated loop prompts (the three build-loop prompts
   plus the single audit prompt), the `run` wrapper, and `README.md` describing
   the installed loops.
@@ -50,9 +51,9 @@ Requires Go 1.26+ and a `ralph`-supported agent. Always run from the repo root.
 
 ## The workflow
 
-Every spec change is the same three beats: discuss the goal in conversation,
-sharpen it with `$grillme`, then `$codify` writes product/research/design/plan
-in one pass (greenfield included).
+Every spec change is the same beats: open a session with `$open-spec`, discuss the
+goal in conversation, sharpen it with `$grill-me`, then `$seal-spec` writes
+product/research/design/plan in one pass (greenfield included).
 `$create-gather-build-verify-prompts` and `$create-audit-prompts` generate
 `project/loops/` once per project or when a loop's design changes. Launching
 `ralph` is always an explicit operator action — normally `project/loops/run`
@@ -68,7 +69,7 @@ for the build loop.
   the test as a `// R-XXXX-XXXX` comment, so coverage is a `grep`.
 - **`STATUS.md` markers are load-bearing.** gather finds the next phase with
   `grep -nE '^- Phase .* ⬜' project/plan/STATUS.md | head -1`. Never add a bare
-  `⬜`/`✅` glyph outside a phase line.
+  `⬜` glyph outside a phase line.
 - **IDs anchor to a 2026 UTC epoch** and are minted only from already-elapsed instants.
 
 ## Boundaries — do not edit
@@ -85,5 +86,6 @@ for the build loop.
 
 - Commit messages are prefixed `idgen:` (e.g. `idgen: prompt-brief fix`).
 - A phase is "done" only when `go test -race ./...` is green and every id in the
-  phase's brief is covered by a genuine id-tagged test; verify flips its `STATUS.md`
-  marker `⬜ → ✅` at that point — no earlier.
+  phase's brief is covered by a genuine id-tagged test; at that point verify
+  **deletes** the phase's `STATUS.md` line and its `phase-NN.md` in the completion
+  commit (done is gone; history lives in git) — no earlier.

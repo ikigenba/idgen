@@ -20,12 +20,13 @@ structure from an existing project into the new one.
 cp -r ../idgen/.agents .
 ```
 
-### 2. Load the spec context
+### 2. Open the spec context
 
-Start `codex` in the new repo, then load the spec contracts.
+Start `codex` in the new repo, then open the spec session. It loads the spec
+contracts (`$ikispec`) and scopes the session to `project/*`.
 
 ```
-use $spec-shapes
+$open-spec
 ```
 
 ### 3. Describe the goal in plain English
@@ -46,17 +47,17 @@ Just talk and describe the app, whatever matters to you.
 > Unix PREFIX argument so that install directories can be overridden. If no
 > PREFIX is provided it should use the standard go install.
 >
-> $grillme
+> $grill-me
 
 The agent will interrogate you until it runs out of questions.
 
 
-### 4. Codify
+### 4. Seal the spec
 
 Then ask it to write the design decisions and build phase breakdown.
 
 ```
-$codify
+$seal-spec
 ```
 
 ### 5. Generate the build loop (once per project)

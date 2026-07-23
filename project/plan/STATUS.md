@@ -1,14 +1,17 @@
 # idgen — Plan Status
 
-This is the manifest: one line per phase in build order, and the **only** place a
-phase's status marker lives. Each phase line is a Markdown bullet beginning with
-`- Phase` and its zero-padded number, then a status marker — `✅` (done) or `⬜`
-(not started) — then `realizes <Decision ids>` (or `realizes —` for a pure
-structural phase), then `— <objective>`. The build loop finds its next work with
+This is the manifest: one line per **pending** phase in build order, and the
+**only** place a phase's status marker lives. Each phase line is a Markdown bullet
+beginning with `- Phase` and its zero-padded number, then `⬜` (pending), then
+`realizes <Decision ids>` (or `realizes —` for a pure structural phase), then
+`— <objective>`. The build loop finds its next work with
 `grep -nE '^- Phase .* ⬜' project/plan/STATUS.md | head -1`, reads only that
-phase's `project/plan/phase-NN.md`, and on completion flips that one marker here.
-This file deliberately carries **no** bare status glyph outside these phase lines,
-so the anchored grep matches only phase lines.
+phase's `project/plan/phase-NN.md`, and **on completion deletes that phase's line
+here and its body file** — there is no done marker; done is gone. This file
+deliberately carries **no** bare status glyph outside these phase lines, so the
+anchored grep matches only phase lines.
+
+Next phase: 05
 
 - Phase 01  ⬜  realizes —          — Scaffolding: module, three seams & Makefile (structural)
 - Phase 02a ⬜  realizes D2         — internal/idgen: encode (mint direction) + Epoch

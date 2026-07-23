@@ -1,6 +1,0 @@
-interface:
-  display_name: "Codify"
-  short_description: "Write a settled goal into the project/ spec."
-  default_prompt: "$codify"
-policy:
-  allow_implicit_invocation: false

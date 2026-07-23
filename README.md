@@ -90,9 +90,9 @@ actually fail?".
 
 The method that wrote this spec ships with the repo, so you can reuse it: spin
 up a **new project from an empty directory**, or **add a feature** to `idgen`
-by changing its spec and rebuilding. Either way it is the same five beats: load
-the spec context, describe the goal in plain English, get grilled one question
-at a time, codify, run the loop. Worked examples, one per agent:
+by changing its spec and rebuilding. Either way it is the same five beats: open
+the spec session, describe the goal in plain English, get grilled one question
+at a time, seal the spec, run the loop. Worked examples, one per agent:
 
 - **[Author with Claude Code](docs/authoring-claude-code.md)**
 - **[Author with the Codex CLI](docs/authoring-codex-cli.md)**

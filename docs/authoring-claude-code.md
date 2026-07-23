@@ -13,9 +13,9 @@ own idea. What matters here is the beats, not the app.
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code), installed and authenticated.
-- The **`idgen` binary on your `PATH`**: codify mints requirement ids with it.
-  Build it from this repo first (any method on the [README](../README.md)),
-  then `make install`.
+- The **`idgen` binary on your `PATH`**: sealing the spec mints requirement ids
+  with it. Build it from this repo first (any method on the
+  [README](../README.md)), then `make install`.
 - The [`ralph`](https://github.com/ikigenba/ralph) harness for the unattended
   run — or drive the loop interactively instead, as
   [claude-code.md](claude-code.md) shows.
@@ -32,13 +32,16 @@ cp -r ../idgen/.claude .
 cp -r ../idgen/.agents .    # optional: the same skills packaged for Codex
 ```
 
-### 2. Load the spec context
+### 2. Open the spec session
 
-Start `claude` in the new repo, then load the spec skillset:
+Start `claude` in the new repo, then open a spec session:
 
 ```
-/skillset spec
+/open-spec
 ```
+
+It loads the spec contracts (the `ikispec` shapes) and scopes the session to
+`project/*`.
 
 ### 3. Describe the goal in plain English
 
@@ -50,10 +53,11 @@ Just talk. A paragraph is plenty to start:
 
 ### 4. Get grilled
 
-The grillme workflow is already loaded (it rides along with `/skillset spec`),
-so just ask:
+Sharpen the goal one question at a time — invoke `/grill-me`:
 
-> grill me on this
+```
+/grill-me
+```
 
 The agent interrogates one question at a time, each with a recommendation
 attached, until the goal is settled:
@@ -67,17 +71,18 @@ attached, until the goal is settled:
 
 Answer until it runs out of questions, not until it "seems good enough".
 
-### 5. Codify
+### 5. Seal the spec
 
 ```
-/codify
+/seal-spec
 ```
 
 One automated pass, no interviewing. When it finishes, `project/` exists:
 `product/README.md` (the why, as outcomes), `design/` (one Decision per file,
 every checkable behavior carrying a **minted `R-XXXX-XXXX` id** — this is where
-your `idgen` binary gets used), `plan/` (dependency-ordered phases, all `⬜` in
-`STATUS.md`), and the workspace map.
+your `idgen` binary gets used), `plan/` (a queue of dependency-ordered pending
+phases, all `⬜` in `STATUS.md`, with a `Next phase` counter), and the workspace
+map.
 
 ### 6. Generate the build loop (once per project)
 
@@ -107,8 +112,9 @@ chmod +x project/loops/run
 project/loops/run
 ```
 
-Watch `project/plan/STATUS.md` flip `⬜ → ✅` phase by phase. The run ends when
-gather finds no unbuilt phase and reports `DONE` — and the source that didn't
+Watch phases disappear from `project/plan/STATUS.md` one by one — verify deletes
+each finished phase's line (and its `phase-NN.md`) as it goes. The run ends when
+gather finds no pending phase and reports `DONE` — and the source that didn't
 exist now does, with every requirement id covered by an id-tagged test.
 
 ## Part 2 — adding a feature
@@ -116,17 +122,17 @@ exist now does, with every requirement id covered by an id-tagged test.
 Same beats, existing spec — this works identically on the project above or on
 `idgen` itself:
 
-1. Start `claude` at the repo root and load the context: `/skillset spec`.
+1. Start `claude` at the repo root and open the session: `/open-spec`.
 2. Describe the change in plain English: *"grump should also take a
    `--mood MOOD` flag that picks the complaint register."*
-3. Ask to be grilled, answer the questions until settled.
-4. `/codify`. The differences from greenfield are worth noticing: product and
+3. `/grill-me`, and answer the questions until settled.
+4. `/seal-spec`. The differences from greenfield are worth noticing: product and
    design are **rewritten in place** to the new current truth, **fresh ids are
    minted only for the new behaviors**, and the plan is **appended** — a new
-   `phase-NN.md` and a new `⬜` line in `STATUS.md`, with finished phases left
-   untouched.
-5. `project/loops/run`. gather skips every `✅` phase and finds only the new
-   `⬜`, so the loop builds just the delta and reports `DONE`.
+   `phase-NN.md` and a new `⬜` line in `STATUS.md`, numbered from the `Next phase`
+   counter, with existing phases left untouched.
+5. `project/loops/run`. gather finds only the new `⬜` phase (completed phases are
+   already gone), so the loop builds just the delta and reports `DONE`.
 
 There is no step 6: the loop is already installed. Regenerate it only when the
 loop design itself changes.

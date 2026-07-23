@@ -3,7 +3,7 @@
 This repository is a spec, not a program. Before you pick a build method, it helps
 to understand *what* you are handing an agent and *why* it is shaped the way it is.
 This page is the tour. It is deliberately narrative; the authoritative spec
-shapes live in the `spec-shapes` skill, while
+shapes live in the `ikispec` skill, while
 [`project/README.md`](../project/README.md) is the thin workspace map every build
 method starts from.
 
@@ -27,14 +27,14 @@ project/design/README.md       the design spine: Conventions, the requirement-id
 project/design/INDEX.md        manifest: each Decision → its file, plus a sorted R-id → Decision map
 project/design/DNN.md          one self-contained Decision each: seams, interfaces, and its Verification ids
 project/plan/README.md         the plan rules (one phase = one package; the done bar)
-project/plan/STATUS.md         the manifest: one ⬜/✅ line per phase, the only home of status markers
+project/plan/STATUS.md         the manifest: a Next phase counter + one ⬜ line per pending phase, the only home of status markers
 project/plan/phase-NN.md       one body per phase: objective + the id slice it must cover
 project/loops/{gather,build,verify}.md   the three build-loop prompts
 project/loops/audit.md         the single prompt of the separate, optional coverage-audit loop
 project/loops/run              the operator entrypoint: a shell wrapper that launches ralph on the build loop
 project/loops/README.md        the installed loops' overview: status contract, state machine, brief schema
 project/README.md              the workspace map (thin: the folder table + pointers)
-.claude/                       the spec-process skills and commands, packaged for Claude Code
+.claude/skills/                the spec-process skills, packaged for Claude Code
 .agents/skills/                the same spec-process skills, packaged for the Codex CLI
 ```
 
@@ -58,9 +58,12 @@ is that **they never restate each other**. Each fact lives in exactly one place:
   document. The design is split for addressability (a spine, one `DNN.md` per
   Decision, and an `INDEX.md`) so a build phase reads only the one Decision it
   realizes.
-- **`project/plan/` owns *construction order*:** an append-only list of phases,
-  each one package's worth of work, naming the design Decisions and id slice it
-  realizes. `STATUS.md` is the only home of the `⬜`/`✅` markers.
+- **`project/plan/` owns *construction order*:** a work queue of **pending**
+  phases, each one package's worth of work, naming the design Decisions and id
+  slice it realizes. A completed phase is **deleted**, so the queue never
+  contradicts the design and construction history lives in git. `STATUS.md` is the
+  only home of the `⬜` markers, plus a `Next phase` counter so numbers are never
+  reused.
 
 The payoff of tagging every checkable behavior with an id is that **coverage
 becomes a grep**: each id-tagged test carries its `// R-XXXX-XXXX` id, so you can
@@ -78,10 +81,11 @@ run in a cycle, each in a fresh, isolated context:
    (`// R-XXXX-XXXX`), then commits.
 3. **verify** is the independent gate. It re-derives the denominator from the
    brief, proves every id is covered by a genuine test with `go test -race ./...`
-   green, and only then flips the phase `⬜ → ✅`.
+   green, and only then **deletes** the finished phase's `STATUS.md` line and its
+   `phase-NN.md` in the completion commit (done is gone; the record is that commit).
 
 Then the cycle wraps back to gather for the next phase, and repeats until gather
-finds no unbuilt phase and reports `DONE`. Because each step starts clean and reads
+finds no pending phase and reports `DONE`. Because each step starts clean and reads
 only what it needs from disk, the loop is reproducible and the model never has to
 remember what happened last turn.
 
@@ -106,26 +110,26 @@ loop in [`project/loops/README.md`](../project/loops/README.md).
 ## How the spec itself was authored
 
 The contract was not written by hand in one sitting. It was settled interactively —
-the goal discussed in conversation, then interrogated one question at a time with
-the `grillme` workflow — and written in one pass by the `codify` workflow, to the
-artifact shapes defined in the `spec-shapes` skill, with the loop prompts generated
-by `create-gather-build-verify-prompts` and `create-audit-prompts`. Build and
-verify are not authoring steps; they belong to the build loop. Those workflows ship
-with the repo for both agents — as skills and commands under
-[`.claude/`](../.claude/) for Claude Code, and as skills under
-[`.agents/skills/`](../.agents/skills/) for the Codex CLI — and that is the point:
-the *method* is meant to be reused, not just the `idgen` it produced.
+a spec session opened with the `open-spec` workflow, the goal discussed in
+conversation, then interrogated one question at a time with the `grill-me`
+workflow — and written in one pass by the `seal-spec` workflow, to the artifact
+shapes defined in the `ikispec` skill, with the loop prompts generated by
+`create-gather-build-verify-prompts` and `create-audit-prompts`. Build and verify
+are not authoring steps; they belong to the build loop. Those workflows ship with
+the repo for both agents — as skills under [`.claude/skills/`](../.claude/skills/)
+for Claude Code, and under [`.agents/skills/`](../.agents/skills/) for the Codex
+CLI — and that is the point: the *method* is meant to be reused, not just the
+`idgen` it produced.
 
-To make a spec change of your own, the recipe is the same in either agent:
+To make a spec change of your own, the recipe is the same in either agent, and each
+step invokes a shipped skill by `$name` reference:
 
-1. Start a session with the spec-process context loaded — `/skillset spec` in
-   Claude Code, or `use $spec-shapes` in Codex. (Codex has no slash commands;
-   its shipped skills are invoked by `$name` reference: `$grillme`, `$codify`.)
+1. Open the spec session — invoke `$open-spec`. It loads the spec contracts
+   (`$ikispec`) and scopes the session to `project/*`.
 2. Describe the change in plain English.
 3. Get grilled and answer the questions, one at a time, until the goal is
-   settled. (In Claude Code the grillme workflow rides along with
-   `/skillset spec` — just ask to be grilled; in Codex, invoke `$grillme`.)
-4. Ask the agent to `codify` — it writes product, research, design, and plan in
+   settled — invoke `$grill-me`.
+4. Seal it — invoke `$seal-spec`. It writes product, research, design, and plan in
    one pass.
 5. From a shell, run `project/loops/run` to rebuild the code from the updated
    spec.

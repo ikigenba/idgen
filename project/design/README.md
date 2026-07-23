@@ -82,6 +82,6 @@ Decision it realizes:
 - `project/design/README.md` — this spine: cross-cutting facts only, no
   per-Decision detail.
 
-Design is **rewritten in place**, not append-only (history lives in the plan): a
+Design is **rewritten in place** (history lives in git, not in the spec): a
 changed Decision is rewritten in its `DNN.md` and `INDEX.md` is regenerated; a new
 Decision adds a `DNN.md` and an INDEX entry.

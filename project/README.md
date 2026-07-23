@@ -8,24 +8,24 @@ are written relative to the **repository root**, which is also the directory the
 build loop runs from.
 
 This repo is spec-driven: the source of truth is this `project/` tree. To change
-behavior you change the spec (settle the goal in conversation, then `/codify`
-writes it) and let the loop implement it — never hand-edit generated code to add
-behavior.
+behavior you change the spec (open a session with `$open-spec`, settle the goal in
+conversation, then `$seal-spec` writes it) and let the loop implement it — never
+hand-edit generated code to add behavior.
 
 ## The folders
 
 | folder | what's in it | written by |
 |---|---|---|
-| `product/` | `README.md` — the *why*: problem, users, scope, user-facing promises, success criteria | `/codify` (rewritten in place) |
-| `research/` | `research.md` — collected external ground truth the design references; optional | `/codify` (rewritten in place) |
-| `design/` | `README.md` (spine) + `INDEX.md` (manifest + sorted `R-id → Decision` map) + `DNN.md` (one per Decision) | `/codify` (rewritten in place) |
-| `plan/` | `README.md` (rules) + `STATUS.md` (the manifest — the only home of the `⬜`/`✅` markers) + `phase-NN.md` (one per phase) | `/codify` (append-only) |
-| `loops/` | the generated build-loop prompts + `README.md` describing the installed loop | `/create-gather-build-verify-prompts` |
+| `product/` | `README.md` — the *why*: problem, users, scope, user-facing promises, success criteria | `$seal-spec` (rewritten in place) |
+| `research/` | `research.md` — collected external ground truth the design references; optional | `$seal-spec` (rewritten in place) |
+| `design/` | `README.md` (spine) + `INDEX.md` (manifest + sorted `R-id → Decision` map) + `DNN.md` (one per Decision) | `$seal-spec` (rewritten in place) |
+| `plan/` | `README.md` (rules) + `STATUS.md` (the manifest — `Next phase` counter + the only home of the `⬜` markers) + `phase-NN.md` (one per **pending** phase) | `$seal-spec` (appends); the build loop deletes completed phases |
+| `loops/` | the generated build-loop prompts + `README.md` describing the installed loop | `$create-gather-build-verify-prompts` |
 
 The artifact shapes, the authority boundaries between them (product owns *why*,
 design owns *how* + the `R-XXXX-XXXX` requirement-id denominator, plan owns
-*order*), and the hard invariants are defined once, in the `spec-shapes` skill
-(`.claude/library/spec-shapes/SKILL.md`) — not restated here. The design's
+*order*), and the hard invariants are defined once, in the `ikispec` skill
+(`.claude/skills/ikispec/SKILL.md`) — not restated here. The design's
 Verification ids are the requirement denominator; there is no separate
 requirements doc.
 
