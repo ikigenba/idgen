@@ -13,5 +13,4 @@ anchored grep matches only phase lines.
 
 Next phase: 05
 
-- Phase 03b ⬜  realizes D4, D5  — internal/cli: decode mode
 - Phase 04  ⬜  realizes D6         — wire cmd/idgen/main + install + release (goreleaser/workflow/install.sh) + version & build smokes
