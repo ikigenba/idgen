@@ -1,3 +1,7 @@
+---
+harness: codex
+model: gpt-5.6-sol
+---
 # build — do a bounded turn of the phase
 
 You are the **build** step of an unattended `gather → build → verify` build loop.
