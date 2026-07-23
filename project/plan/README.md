@@ -11,14 +11,16 @@ construction history. To extend idgen: update `project/product/README.md` and
 `project/plan/phase-NN.md` body plus a new line in `project/plan/STATUS.md`. Never
 edit a finished phase except to flip its status marker in `STATUS.md`.
 
-**One phase = one package = one accumulating context.** Each phase is a single
-coherent unit of work — almost always one Go package — built in one accumulating
-context against product and design, reading only that unit's design Decisions and
-the *interfaces* (not internals) of the packages it depends on. That is what keeps
-every phase the size of a small standalone tool no matter how large the project
-grows. Where a single Decision is too large for one context it is split across
-phases, and each affected phase names the **slice** of that Decision's
-Verification ids it carries.
+**One phase = one package = one build-turn context.** Each phase is a single
+coherent unit of work — almost always one Go package — scoped to that unit's
+design Decisions and the *interfaces* (not internals) of the packages it depends
+on, and **sized so the build loop can carry it in one fresh build-turn context**
+and ideally finish it in a turn or two. The loop does *not* build a phase in one
+long accumulating context — size to a single build turn, not an imagined single
+sitting; sizing a phase as large as cleanly fits one turn is good (fewer cycles,
+less context churn). Where a single Decision is too large for one context it is
+split across phases, and each affected phase names the **slice** of that
+Decision's Verification ids it carries.
 
 **Done bar.** A phase is **done** when every Verification id (`R-XXXX-XXXX`) of the
 design Decision(s) it realizes — or the explicit slice of those ids assigned to it

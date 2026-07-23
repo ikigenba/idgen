@@ -31,14 +31,8 @@ requirements doc.
 
 ## The build loop
 
-How the installed loop works — the `ralph` invocation, the status contract, the
-state machine, and the `brief.md` schema — is documented beside the prompts, in
-[`project/loops/README.md`](loops/README.md). Run it from the repository root:
-
-```
-ralph project/loops/gather.md project/loops/build.md project/loops/verify.md
-```
-
-By convention the committed wrapper `project/loops/run` issues that invocation
-with the operator's chosen harness/model flags baked in, so the build launches
-with one short command.
+How the installed loop works — its prompts, the status contract, the state
+machine, and the `brief.md` schema — is documented beside the prompts, in
+[`project/loops/README.md`](loops/README.md), and is run from the repository root
+via the committed `project/loops/run` wrapper. This map restates none of those
+mechanics.

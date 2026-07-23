@@ -12,26 +12,20 @@ This is the **single, current** statement of the architecture: when a decision
 changes, its `DNN.md` is rewritten in place to stay true (stale decisions are
 removed, not stacked). History of how it got here lives in `project/plan/`.
 
-## Requirement ids — the denominator
+## Requirement ids
 
 - Each Decision ends with a **Verification** list: the concrete behaviors a test
   must assert for that decision to be considered built.
 - Every Verification item carries a minted **idgen id** (`R-XXXX-XXXX`) — a
-  stable, unique handle for that one requirement. The ids live inline in those
-  lists and **nowhere else**; there is **no separate requirements document**.
-- **That set of ids is the denominator** — the enumerated intent the test suite is
-  measured against. A behavior is **covered** when a test asserts it *and names its
-  id in a `// R-XXXX-XXXX` comment*, so coverage is a grep, not a separate
-  cross-reference. A single `//` comment may carry **several comma-separated ids**
-  when one assertion proves more than one behavior (e.g. `--version` printing
-  exactly `v0.1.0` on stdout with exit 0 proves both the dispatch id and the
-  version-constant id); coverage matches an id anywhere in a `//` comment, not only
-  immediately after the slashes.
-- The work is **done** when every Verification id is covered and
-  `go test -race ./...` is green. The denominator stays honest by being pruned:
-  remove a requirement here and you remove its id and its test. Ids are minted
-  with `idgen` itself (`idgen -n <count> -p R`) and never hand-written; an existing
-  id is never renumbered.
+  stable, unique handle for that one behavior. The ids live inline in those lists
+  and **nowhere else**; there is **no separate requirements document**. Ids are
+  minted with `idgen` itself (`idgen -n <count> -p R`), never hand-written: a
+  fresh id per newly added behavior, an existing id never renumbered, and a
+  removed behavior takes its id (and its test) with it.
+- **Design's responsibility for these ids ends at minting them.** This id set is
+  the requirement denominator, but *how* coverage is measured against it and
+  *when* the work is "done" are downstream concerns (the plan and the build
+  loop) — they are not specified here.
 
 ## Conventions
 
