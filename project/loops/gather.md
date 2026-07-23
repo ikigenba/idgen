@@ -22,7 +22,8 @@ grounded gap feedback survive across cycles.
    grep -nE '^- Phase .* ⬜' project/plan/STATUS.md | head -1
    ```
 
-   - **No match** → every phase is `✅`. The job is complete. Report **`DONE`**
+   - **No match** → every phase has been completed (and deleted). The job is
+     complete. Report **`DONE`**
      (see *Reporting the result*). This is the **only** end of the loop. Do
      nothing else.
    - **A match** → note that phase's number `NN` (e.g. `02a`, `03a`). Continue.
@@ -33,8 +34,9 @@ grounded gap feedback survive across cycles.
      any `verify` feedback are still the live target. **Leave the brief exactly as
      is** (touch neither region), open **no** big doc, and report `NEXT`. You are
      done for this turn.
-   - If `<X>` is a **different** phase (that phase is now `✅`), the brief is stale.
-     Author a fresh one — go to step 3.
+   - If `<X>` is a **different** phase, or `<X>` names a phase with **no**
+     `STATUS.md` line left (it passed and was completed/deleted), the brief is
+     stale. Author a fresh one — go to step 3.
    - If there is **no** brief at all, author a fresh one — go to step 3.
 
 3. **Read the one phase file.** Read only `project/plan/phase-NN.md`. From it,

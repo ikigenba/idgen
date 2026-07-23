@@ -8,7 +8,7 @@ having been read.
 
 You read **only** `project/loops/brief.md` — **never** the big design/plan/product
 docs. You do a bounded, idempotent turn of the phase's remaining work and commit
-it. You do **not** judge completeness and do **not** flip status markers.
+it. You do **not** judge completeness and do **not** retire phases.
 
 ## Procedure
 
@@ -76,7 +76,8 @@ it. You do **not** judge completeness and do **not** flip status markers.
 
 - Never read `project/design/`, `project/plan/`, or `project/product/` — the brief
   is your complete and only input.
-- Never edit `project/plan/STATUS.md` or flip a `⬜`/`✅` marker.
+- Never edit `project/plan/STATUS.md`, never delete a phase's `STATUS.md` line
+  or its `phase-NN.md` file.
 - Never delete or edit `project/loops/brief.md`, including its `## Verify feedback`
   region — you **read** feedback but never **write** it.
 - Always hand off with `NEXT`. You are never the step that ends the run.

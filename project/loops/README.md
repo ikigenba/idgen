@@ -41,13 +41,13 @@ The `{status, message}` schema is supplied by the harness out of band (codex via
 `StructuredOutput` tool) — the prompts describe only the contract, never a
 transport.
 
-## Per-step reads / writes / commits / flips
+## Per-step reads / writes / commits / deletions
 
-| step | reads | writes | commits | flips marker |
+| step | reads | writes | commits | retires phase |
 |---|---|---|---|---|
 | **gather** | `STATUS.md`, one `phase-NN.md`, `INDEX.md`, realized `D0N.md` | brief **contract** region (fresh phase only) | no | no |
 | **build** | `brief.md` only | package source + co-located `*_test.go` | yes (each turn) | no |
-| **verify** | `brief.md`, the test suite | brief **feedback** region *or* deletes brief; `STATUS.md` on pass | yes (marker flip / stall log) | **yes, on pass only** |
+| **verify** | `brief.md`, the test suite | brief **feedback** region *or* deletes brief; deletes `STATUS.md` line + `phase-NN.md` on pass | yes (phase deletion / stall log) | **yes, on pass only** |
 
 ## The brief lifecycle
 
@@ -60,10 +60,10 @@ per-cycle):
   brief — it never regenerates it, so the contract and verify's feedback persist.
 - **build** consumes the brief (contract + feedback) each cycle and commits its
   increment, never touching the brief.
-- **verify** either **passes** the phase (flip `⬜→✅`, commit, **delete the
-  brief**) or records a **gap** (overwrite the feedback region with the open gaps,
-  **keep the brief**). The brief thus persists across cycles until a pass or a
-  stall reset.
+- **verify** either **passes** the phase (delete its `STATUS.md` line and its
+  `phase-NN.md` file, commit, **delete the brief**) or records a **gap**
+  (overwrite the feedback region with the open gaps, **keep the brief**). The
+  brief thus persists across cycles until a pass or a stall reset.
 
 ## Why the loop converges
 
