@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bytes"
+	"io"
 	"regexp"
 	"strings"
 	"testing"
@@ -23,8 +24,12 @@ func (c *fakeClock) Sleep(d time.Duration) {
 }
 
 func runForTest(args []string, clock Clock) (int, string, string) {
+	return runForTestWithInput(args, strings.NewReader(""), clock)
+}
+
+func runForTestWithInput(args []string, stdin io.Reader, clock Clock) (int, string, string) {
 	var stdout, stderr bytes.Buffer
-	code := Run(args, strings.NewReader(""), &stdout, &stderr, "v-test", clock)
+	code := Run(args, stdin, &stdout, &stderr, "v-test", clock)
 	return code, stdout.String(), stderr.String()
 }
 
@@ -302,5 +307,162 @@ func TestHelpMentionsPrimaryFlags(t *testing.T) {
 		if !strings.Contains(stdout, flag) {
 			t.Errorf("usage does not mention %q: %q", flag, stdout)
 		}
+	}
+}
+
+func TestDecodeFlagRoutesToDecodePath(t *testing.T) {
+	instant := idgen.Epoch.Add(1500 * time.Millisecond)
+	id := idgen.MintAt("R", instant)
+	code, stdout, stderr := runForTest([]string{"--decode", id}, &fakeClock{})
+
+	// R-X5JF-DYSO
+	if code != exitSuccess || stdout != "2026-01-01T00:00:01.500Z\n" || stderr != "" {
+		t.Fatalf("Run() = (%d, %q, %q), want decoded instant", code, stdout, stderr)
+	}
+}
+
+func TestDecodeIgnoresMintFlags(t *testing.T) {
+	instant := idgen.Epoch.Add(2345 * time.Millisecond)
+	id := idgen.MintAt("R", instant)
+	baseCode, baseStdout, baseStderr := runForTest([]string{"--decode", id}, &fakeClock{})
+	code, stdout, stderr := runForTest(
+		[]string{"--decode", "-n", "99", "-p", "IGNORED", id},
+		&fakeClock{},
+	)
+
+	// R-X6RB-RQJD
+	if code != baseCode || stdout != baseStdout || stderr != baseStderr {
+		t.Fatalf(
+			"decode with mint flags = (%d, %q, %q), want unchanged (%d, %q, %q)",
+			code, stdout, stderr, baseCode, baseStdout, baseStderr,
+		)
+	}
+}
+
+func TestDecodePositionalsPreservesInputOrder(t *testing.T) {
+	ids := []string{
+		idgen.MintAt("ONE", idgen.Epoch.Add(5*time.Millisecond)),
+		idgen.MintAt("TWO", idgen.Epoch.Add(2*time.Second)),
+		idgen.MintAt("THREE", idgen.Epoch.Add(999*time.Millisecond)),
+	}
+	code, stdout, stderr := runForTest(
+		append([]string{"--decode"}, ids...),
+		&fakeClock{},
+	)
+
+	// R-X974-JA0R
+	want := "" +
+		"2026-01-01T00:00:00.005Z\n" +
+		"2026-01-01T00:00:02.000Z\n" +
+		"2026-01-01T00:00:00.999Z\n"
+	if code != exitSuccess || stdout != want || stderr != "" {
+		t.Fatalf("Run() = (%d, %q, %q), want ordered decode output %q", code, stdout, stderr, want)
+	}
+}
+
+func TestDecodeStdinMixedWhitespaceMatchesPositionals(t *testing.T) {
+	ids := []string{
+		idgen.MintAt("A", idgen.Epoch.Add(10*time.Millisecond)),
+		idgen.MintAt("B", idgen.Epoch.Add(20*time.Millisecond)),
+		idgen.MintAt("C", idgen.Epoch.Add(30*time.Millisecond)),
+	}
+	positionalCode, positionalStdout, positionalStderr := runForTest(
+		append([]string{"--decode"}, ids...),
+		&fakeClock{},
+	)
+	stdin := strings.NewReader(ids[0] + "\t" + ids[1] + "\n \r\n" + ids[2])
+	code, stdout, stderr := runForTestWithInput([]string{"--decode"}, stdin, &fakeClock{})
+
+	// R-XAF0-X1RG
+	if code != positionalCode || stdout != positionalStdout || stderr != positionalStderr {
+		t.Fatalf(
+			"stdin decode = (%d, %q, %q), want positional result (%d, %q, %q)",
+			code, stdout, stderr, positionalCode, positionalStdout, positionalStderr,
+		)
+	}
+}
+
+type forbiddenReader struct {
+	t *testing.T
+}
+
+func (r forbiddenReader) Read([]byte) (int, error) {
+	r.t.Helper()
+	r.t.Fatal("stdin Read called despite positional decode input")
+	return 0, nil
+}
+
+func TestDecodePositionalsDoNotReadStdin(t *testing.T) {
+	instant := idgen.Epoch.Add(42 * time.Millisecond)
+	id := idgen.MintAt("R", instant)
+	code, stdout, stderr := runForTestWithInput(
+		[]string{"--decode", id},
+		forbiddenReader{t: t},
+		&fakeClock{},
+	)
+
+	// R-XBMX-ATI5
+	if code != exitSuccess || stdout != "2026-01-01T00:00:00.042Z\n" || stderr != "" {
+		t.Fatalf("Run() = (%d, %q, %q), want positional-only decode", code, stdout, stderr)
+	}
+}
+
+func TestDecodeMalformedTokenContinuesBatch(t *testing.T) {
+	first := idgen.MintAt("R", idgen.Epoch.Add(7*time.Millisecond))
+	last := idgen.MintAt("R", idgen.Epoch.Add(9*time.Millisecond))
+	const malformed = "not-an-id"
+	code, stdout, stderr := runForTest(
+		[]string{"--decode", first, malformed, last},
+		&fakeClock{},
+	)
+
+	// R-XCUT-OL8U
+	wantStdout := "2026-01-01T00:00:00.007Z\n2026-01-01T00:00:00.009Z\n"
+	if code != exitFailure || stdout != wantStdout {
+		t.Fatalf("Run() = (%d, stdout %q), want partial output %q and exit 1", code, stdout, wantStdout)
+	}
+	if !strings.Contains(stderr, malformed) {
+		t.Fatalf("stderr = %q, want malformed token %q named", stderr, malformed)
+	}
+}
+
+func TestDecodeEmptyInputIsVacuousSuccess(t *testing.T) {
+	code, stdout, stderr := runForTestWithInput(
+		[]string{"--decode"},
+		strings.NewReader(""),
+		&fakeClock{},
+	)
+
+	// R-XE2Q-2CZJ
+	if code != exitSuccess || stdout != "" || stderr != "" {
+		t.Fatalf("Run() = (%d, %q, %q), want silent success", code, stdout, stderr)
+	}
+}
+
+func TestMintThenDecodeRoundTripThroughRun(t *testing.T) {
+	instant := idgen.Epoch.Add(987654 * time.Millisecond)
+	mintCode, mintStdout, mintStderr := runForTest(nil, &fakeClock{now: instant})
+	if mintCode != exitSuccess || mintStderr != "" {
+		t.Fatalf("mint Run() = (%d, %q, %q), want success", mintCode, mintStdout, mintStderr)
+	}
+
+	id := strings.TrimSpace(mintStdout)
+	code, stdout, stderr := runForTest([]string{"--decode", id}, &fakeClock{})
+
+	// R-XFAM-G4Q8
+	if code != exitSuccess || stdout != "2026-01-01T00:16:27.654Z\n" || stderr != "" {
+		t.Fatalf("decode Run() = (%d, %q, %q), want minting instant", code, stdout, stderr)
+	}
+}
+
+func TestDecodeOutputIsUTCRegardlessOfTZ(t *testing.T) {
+	t.Setenv("TZ", "America/Chicago")
+	instant := time.Date(2026, time.January, 1, 6, 2, 3, 4*int(time.Millisecond), time.UTC)
+	id := idgen.MintAt("R", instant)
+	code, stdout, stderr := runForTest([]string{"--decode", id}, &fakeClock{})
+
+	// R-XIYB-LFYB
+	if code != exitSuccess || stdout != "2026-01-01T06:02:03.004Z\n" || stderr != "" {
+		t.Fatalf("Run() = (%d, %q, %q), want UTC output", code, stdout, stderr)
 	}
 }
