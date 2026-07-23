@@ -4,7 +4,8 @@ This repository is **`idgen` with no source code.** It ships the spec that
 *generates* it, and nothing else. Point an AI coding agent at that spec and it
 writes the code, tests it, and proves it against the spec.
 
-*Just want to build it? See the [build instructions](#how-to-build-it) below.*
+*Just want the tool? [Install a prebuilt binary](#install) below. Want to build
+it from the spec? See the [build instructions](#how-to-build-it).*
 
 So it is two things at once:
 
@@ -46,13 +47,34 @@ R-4K7P-9ZQ2
 - `-p PREFIX` / `--prefix PREFIX`: override the default `R` prefix.
 - `--decode`: decode IDs (from args or whitespace-separated stdin) to their
   ISO-8601 UTC minting time, to the millisecond.
-- `--help`, `--version`: usage and version (`0.1.0-pre+20260616`).
+- `--help`, `--version` (or `-V`): usage and version. A release build reports its
+  git tag (e.g. `v0.1.0`); an unstamped build reports `dev`.
 
 All times are UTC; IDs are minted only from a millisecond that has already elapsed.
 
 These are the very same `R-XXXX-XXXX` ids that this project uses to track its own
 requirements. The design mints one per checkable behavior, so **`idgen` is built
 using `idgen`**.
+
+## Install
+
+Prebuilt binary (no Go toolchain needed):
+
+    curl -fsSL https://raw.githubusercontent.com/ikigenba/idgen/main/install.sh | sh
+
+Installs the latest release to `~/.local/bin` (override with `BINDIR=/path` or
+`PREFIX=/path`; pin a version with `IDGEN_VERSION=v0.1.0`). Make sure the target
+dir is on your `PATH`.
+
+From source (requires Go):
+
+    make install
+
+Builds `bin/idgen` and installs it to `~/.local/bin` (override with
+`PREFIX=/path make install`).
+
+The rest of this README covers the other side of the repo: building `idgen`
+from its spec.
 
 ## Prerequisites
 
