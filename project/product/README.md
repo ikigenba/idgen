@@ -31,8 +31,9 @@ minted?" They run it from a terminal or pipe it into other tools.
 ## Scope
 
 - **Single purpose.** Mint IDs; decode them back to instants. Nothing else.
-- **Install from source only.** No binary distribution, no package registries; a
-  `Makefile` builds, tests, and installs it.
+- **Two ways to install.** Build and install from source with the `Makefile`, or
+  fetch a prebuilt release binary published for the tagged release. No package
+  registries.
 - **No external runtime dependencies.** Standard library only.
 
 ## Contractual constants
@@ -41,7 +42,10 @@ These are promises, not implementation detail, so the product owns them; the
 design *uses* them and never re-declares their values:
 
 - **Epoch** — `2026-01-01T00:00:00Z` (UTC). Every ID is anchored to it.
-- **Version** — starts at `v0.1.0`, following Semantic Versioning 2.0.0.
+- **Version** — the first release is tagged `v0.1.0`; releases follow Semantic
+  Versioning 2.0.0 and are named by their git tag (`vMAJOR.MINOR.PATCH`). The
+  version is never a hand-maintained value in the sources — the git tag is its
+  only source of truth.
 
 ## What we promise (user-facing behavior)
 
@@ -91,8 +95,12 @@ decode — always prints a message describing what was wrong before the tool
 exits with a non-zero status. A user is never left staring at empty output
 wondering whether anything ran.
 
-**Help and version.** `--help` prints usage; `--version` prints the version
-string.
+**Help and version.** `--help` (or `-h`) prints usage. `--version` (or `-V`)
+prints the version string, and that string identifies the exact source the
+binary was built from: a release build reports its git tag (`v0.1.0`); a build
+taken between tags or from modified sources says so; a build with no version
+information stamped in reports `dev`. No version number is maintained by hand
+anywhere in the sources.
 
 **Time correctness.** Every printed time is UTC regardless of the operator's local
 zone — local time never leaks into an ID or into decode output. IDs are minted
@@ -110,4 +118,7 @@ only from instants that have already elapsed, never the future.
 - Any invalid invocation (bad flag, missing required value, invalid prefix,
   malformed decode input) prints a message explaining the problem and exits
   non-zero — it never exits silently with no output.
-- The tool builds, tests, and installs from source via the `Makefile`.
+- The tool builds, tests, and installs from source via the `Makefile`, and a
+  tagged release publishes a prebuilt binary a user can fetch and run.
+- Asking a release build for its version reports its git tag; asking a build
+  with no version stamped in reports `dev`.

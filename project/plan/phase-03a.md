@@ -6,10 +6,12 @@ Decision 4 (grammar, dispatch & exit codes), and the version/usage slice of
 Decision 6; the testing strategy is Decision 7. Depends on Phase 02b.*
 
 The mint half of the CLI, consuming `internal/idgen` only through `MintAt`:
-`Run(...)` with one `flag.FlagSet`, enough dispatch to route a non-`--decode`
-invocation to the mint path; the `Clock` seam and distinct-millisecond mint wait
-loop (D3); default/`-n`/`-p` mint with prefix and number validation (D5 mint
-slice); `--help`/`--version`/usage text (D6 version/usage slice); the `0`/`2`
+`Run(args, stdin, stdout, stderr, version, clock)` with one `flag.FlagSet` (the
+`version` string is injected by `main`, D6 — the CLI holds no version literal),
+enough dispatch to route a non-`--decode` invocation to the mint path; the
+`Clock` seam and distinct-millisecond mint wait loop (D3); default/`-n`/`-p` mint
+with prefix and number validation (D5 mint slice); `--help` and `--version`/`-V`
+printing the injected version + usage text (D6 usage slice); the `0`/`2`
 exit-code taxonomy for these paths (D4 mint slice). The observable end state:
 `cli.Run(args, stdin, stdout, stderr, clk)` mints correctly — default prefix,
 custom prefix, `-n` repetition, validation errors, help/version — over in-memory
@@ -31,7 +33,10 @@ in-memory buffers and a **fake `Clock`** (no subprocess, no real sleeps):
 
 *Grammar, dispatch & exit codes — mint slice (D4):*
 - R-X0NT-UVTW — `--help`/`-h` → `Usage:` line counted **exactly once** on stdout, stderr empty, exit 0 (rules out the stdlib-`flag` double print).
-- R-X1VQ-8NKL — `--version` → version string on stdout, exit 0.
+- R-X1VQ-8NKL — `--version` → the injected version string on stdout, exit 0 (the
+  test passes a known version into `Run` and asserts stdout is exactly it).
+- R-TIQT-QVU3 — `-V` (short alias) → the same injected version string on stdout,
+  exit 0 — the alias is wired, not silently ignored.
 - R-X33M-MFBA — unknown flag → exit 2, stderr non-empty (flag's own parse error).
 - R-X4BJ-071Z — mint with a positional argument → exit 2 **and** stderr is
   non-empty (names the unexpected argument) — not merely a non-zero exit.
@@ -49,9 +54,8 @@ in-memory buffers and a **fake `Clock`** (no subprocess, no real sleeps):
 - R-XHQF-7O7M — number validation: `0`, `-3` → exit 2 and stderr contains
   `--number must be > 0` (never a silent exit).
 
-*Version & usage (D6 slice):*
-- R-XK67-Z7P0 — `--version` stdout is exactly `v0.1.0`.
+*Usage (D6 slice):*
 - R-XLE4-CZFP — `--help` usage mentions each flag (`-n`, `-p`, `--decode`).
 
 *(`--decode` dispatch, the decode-only D4 ids, the decode slice of D5, and the D6
-build-smoke requirement are carried by Phase 03b / Phase 04.)*
+version-seam + build-smoke requirements are carried by Phase 03b / Phase 04.)*

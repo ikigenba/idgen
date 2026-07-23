@@ -5,8 +5,10 @@ seams, public interfaces, naming, types, the data model, the encoding math — a
 *how each behavior is proven*. `project/product/README.md` owns the *why* and the
 user-facing promises; design states the **exact, checkable form** of those
 promises and never re-declares the why. The contractual constants (the 2026 epoch
-and the version string) are the product's; design uses their values, it does not
-own them.
+and the initial release tag) are the product's; design uses them, it does not own
+them. The version is not a literal in the sources at all — design realizes the
+product's "the git tag is the version's only source of truth" promise through a
+build-time linker seam (D6).
 
 This is the **single, current** statement of the architecture: when a decision
 changes, its `DNN.md` is rewritten in place to stay true (stale decisions are
@@ -34,8 +36,9 @@ Shared facts every Decision leans on:
 - **Language / toolchain.** Go 1.26, module path `github.com/ai4mgreenly/idgen`.
   Standard library only — no third-party runtime dependency.
 - **Build / typecheck command.** `go build ./...`. The `Makefile` (D6) wraps the
-  toolchain: `make build` produces `bin/idgen`; `make test`, `make fmt`,
-  `make clean`, `make install` are the other targets.
+  toolchain: `make build` produces `bin/idgen`, stamping the git-derived version
+  into the binary via `-ldflags -X main.version=...` (D6); `make test`,
+  `make fmt`, `make clean`, `make install` are the other targets.
 - **Test command — the green gate.** `go test -race ./...`. **"The suite is green"
   means it exits 0** with every package `ok` or no-test. The race detector is cheap
   CI insurance even though the tool is single-goroutine.
@@ -65,8 +68,10 @@ Shared facts every Decision leans on:
   its requirements with unit + randomized property tests at zero process setup;
   `cli` proves its
   requirements through in-memory `args`/`stdin`/`stdout` buffers, a return code, and
-  a **fake `Clock`** whose `Sleep` advances virtual time; `main` has no logic and
-  carries no requirement (a build smoke check stands in for it).
+  a **fake `Clock`** whose `Sleep` advances virtual time; `main` carries only the
+  version linker seam it threads into `cli.Run` (D6) — its behaviors are the
+  version smokes and the build smoke, the one place a real build/subprocess is
+  used (D6, D7).
 
 ## Layout
 
